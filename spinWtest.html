@@ -18,7 +18,7 @@
             color: #333;
         }
 
-        /* Title from the first image */
+        /* Title */
         h1 {
             font-size: 2.5em;
             font-weight: normal;
@@ -29,8 +29,8 @@
         /* Container for the wheel and pointer */
         .spinner-container {
             position: relative;
-            width: 450px;
-            height: 450px;
+            width: 600px;
+            height: 600px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -82,9 +82,9 @@
             height: 100%;
             text-align: center;
             color: white;
-            font-size: 2.2em;
+            font-size: 2.8em;
             font-weight: bold;
-            padding-top: 40px;
+            padding-top: 50px;
             box-sizing: border-box;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
@@ -104,14 +104,14 @@
         /* The central spin button */
         .spin-button {
             position: absolute;
-            width: 90px;
-            height: 90px;
+            width: 120px;
+            height: 120px;
             background: white;
             border-radius: 50%;
             display: grid;
             place-items: center;
             font-weight: bold;
-            font-size: 1.5em;
+            font-size: 1.8em;
             color: #555;
             cursor: pointer;
             border: 5px solid #e0e0e0;
@@ -127,24 +127,6 @@
         .spin-button.spinning {
             cursor: not-allowed;
             pointer-events: none;
-        }
-        
-        /* Styling for the new "Play Again" button */
-        .reset-button {
-            margin-top: 30px;
-            padding: 10px 25px;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #fff;
-            background-color: #585858;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .reset-button:hover {
-            background-color: #333;
         }
 
         /* Winner announcement */
@@ -179,15 +161,12 @@
     </div>
     
     <div class="winner-display" id="winner-display"></div>
-    <button class="reset-button" id="reset-btn">Play Again</button>
 
     <script>
         const wheel = document.getElementById("wheel");
         const spinBtn = document.getElementById("spin-btn");
-        const resetBtn = document.getElementById("reset-btn");
         const winnerDisplay = document.getElementById("winner-display");
         
-        // Updated segments array for 10 prizes - arranged according to the visual layout
         const segments = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10'];
 
         let currentRotation = 0;
@@ -228,7 +207,6 @@
             const segmentAngle = 360 / segments.length;
             
             // Calculate which segment the pointer is pointing to
-            // Since segments start from F7 at 0-36 degrees, we need to account for this
             const adjustedAngle = (360 - normalizedRotation) % 360;
             const segmentIndex = Math.floor(adjustedAngle / segmentAngle);
             
@@ -236,24 +214,6 @@
 
             // Display winner
             winnerDisplay.textContent = `🎉 Winner: ${winner}! 🎉`;
-        });
-        
-        // "Play Again" button functionality
-        resetBtn.addEventListener("click", () => {
-            if (isSpinning) return;
-            
-            // Clear winner display
-            winnerDisplay.textContent = "";
-            
-            // Reset wheel position
-            wheel.style.transition = 'none';
-            currentRotation = 0;
-            wheel.style.transform = 'rotate(0deg)';
-
-            // Re-enable transition
-            setTimeout(() => {
-                wheel.style.transition = 'transform 6s cubic-bezier(0.2, 0.8, 0.2, 1)';
-            }, 50);
         });
 
     </script>
