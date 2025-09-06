@@ -3,1061 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buy First, Win Now!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
+    <title>Enhanced Color Wheel Spinner</title>
     <style>
+        @import url("https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Alegreya+Sans+SC:wght@400;900&display=swap");
+        
+        :root {
+          --font-main: "Alegreya Sans SC", sans-serif;
+          --font-fun: "Fredoka One", cursive;
+          --color-bg: #000b14;
+          --color-theme: #EE786E;
+          --color-accent: #FFD700;
+        }
+        
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
         }
-
+        
         body {
-            font-family: 'Poppins', sans-serif;
-            background: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            overflow-x: hidden;
-            padding-bottom: 0;
+          height: 100vh;
+          background: radial-gradient(circle at center, #001122 0%, var(--color-bg) 100%);
+          color: var(--color-theme);
+          font-family: var(--font-main);
+          overflow: hidden;
         }
-
-        .container {
-            max-width: 1200px;
-            width: 100%;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
+        
+        /* Animated background dots */
+        .bg-dots {
+          position: fixed;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: -1;
         }
-
-        /* Header Section */
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
+        
+        .bg-dot {
+          position: absolute;
+          width: 3px;
+          height: 3px;
+          background: var(--color-theme);
+          border-radius: 50%;
+          opacity: 0.3;
+          animation: float 6s infinite ease-in-out;
         }
-
-        .title {
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: 800;
-            color: #2c3e50;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            letter-spacing: -2px;
-            line-height: 0.9;
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+          50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
         }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: #7f8c8d;
-            margin-top: 10px;
-            font-weight: 400;
+        
+        h1 {
+          position: absolute;
+          top: 2rem;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 4rem;
+          font-family: var(--font-fun);
+          text-shadow: 0 0 20px currentColor;
+          transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          z-index: 10;
         }
-
-        /* Form Section */
-        .form-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            min-width: 400px;
-            max-width: 500px;
-            width: 100%;
+        
+        h1.isHidden {
+          opacity: 0;
+          visibility: hidden;
+          transform: translateX(-50%) translateY(-2rem) scale(0.5);
         }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        
+        .wheel-container {
+          position: absolute;
+          left: 50%;
+          bottom: -35%;
+          transform: translateX(-50%);
+          width: 80vmin;
+          height: 80vmin;
         }
-
-        .input-label {
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        
+        svg#wheel {
+          width: 100%;
+          height: 100%;
+          filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.3));
         }
-
-        .input-field {
-            padding: 15px 20px;
-            border: 2px solid #e0e6ed;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-family: inherit;
-            transition: all 0.3s ease;
-            background: white;
+        
+        svg#pin {
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%) rotate(90deg);
+          width: 6%;
+          height: 6%;
+          fill: var(--color-theme);
+          filter: drop-shadow(0 0 10px currentColor);
+          z-index: 5;
         }
+        
+        .spin-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  font-size: 1.2rem;
+  font-family: var(--font-fun);
+  color: #000;
+  background: #FFD700;
+  border: 3px solid #000;
+  border-radius: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  outline: none;
+  min-width: 100px;
+  min-height: 100px;
+  max-width: 100px;
+  max-height: 100px;
+}
 
-        .input-field:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+.spin-button:hover {
+  background: #FFF200;
+}
+
+.spin-button:active {
+  background: #E6C200;
+}
+
+.spin-button.isSpinning {
+  cursor: not-allowed;
+  background: #CCC;
+}
+        
+        @keyframes buttonSpin {
+          0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+          25% { transform: translate(-50%, -50%) rotate(5deg); }
+          75% { transform: translate(-50%, -50%) rotate(-5deg); }
         }
-
-        .select-field {
-            padding: 15px 20px;
-            border: 2px solid #e0e6ed;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-family: inherit;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        
+        @keyframes pinWheel {
+          0%, 100% { transform: translateX(-50%) rotate(90deg); }
+          25% { transform: translateX(-50%) rotate(75deg); }
+          75% { transform: translateX(-50%) rotate(105deg); }
         }
-
-        .select-field:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .ready-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 10px;
-        }
-
-        .ready-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .ready-button:active {
-            transform: translateY(0);
-        }
-
-        /* Wheel Section */
-        .wheel-section {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .wheel-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            text-align: center;
-        }
-
-       .wheel-wrapper {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #wheel {
-            width: 800px;
-            height: 400px;
-            border-radius: 800px 800px 0 0;
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            overflow: hidden;
-            border: 12px solid #fff;
-            border-bottom: none;
-            box-shadow: rgba(0,0,0,0.2) 0px -10px 30px;
-        }
-
-        #wheel:before {
-            content: '';
-            position: absolute;
-            border: 6px solid rgba(0,0,0,0.1);
-            width: 388px;
-            height: 388px;
-            border-radius: 50%;
-            z-index: 1000;
-        }
-
-        #inner-wheel {
-            width: 100%;
-            height: 100%;
-            transition: all 4s cubic-bezier(0,.99,.44,.99);
-        }
-
-        #wheel div.sec {
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 400px 100px 0;
-            border-color: #E74C3C transparent;
-            transform-origin: 100px 399px;
-            left: 300px;
-            top: -6px;
-            opacity: 1;
-        }
-
-        #wheel div.sec:nth-child(1) { transform: rotate(0deg); border-color: #E74C3C transparent; }
-        #wheel div.sec:nth-child(2) { transform: rotate(22.5deg); border-color: #F39C12 transparent; }
-        #wheel div.sec:nth-child(3) { transform: rotate(45deg); border-color: #3498DB transparent; }
-        #wheel div.sec:nth-child(4) { transform: rotate(67.5deg); border-color: #2ECC71 transparent; }
-        #wheel div.sec:nth-child(5) { transform: rotate(90deg); border-color: #9B59B6 transparent; }
-        #wheel div.sec:nth-child(6) { transform: rotate(112.5deg); border-color: #E67E22 transparent; }
-        #wheel div.sec:nth-child(7) { transform: rotate(135deg); border-color: #1ABC9C transparent; }
-        #wheel div.sec:nth-child(8) { transform: rotate(157.5deg); border-color: #F1C40F transparent; }
-
-        #wheel div.sec .prize-text {
-            margin-top: -250px;
-            color: rgba(255,255,255,0.9);
-            position: relative;
-            z-index: 10000000;
-            display: block;
-            text-align: center;
-            font-size: 22px;
-            font-weight: 700;
-            margin-left: -30px;
-            text-shadow: rgba(0,0,0,0.6) 0px 2px 4px;
-        }
-
-        #spin {
-            width: 100px;
-            height: 100px;
-            position: absolute;
-            bottom: -50px;
-            left: 50%;
-            margin-left: -50px;
-        }
-
-        #spin:after {
-            content: "SPIN";
-            text-align: center;
-            line-height: 100px;
-            color: #666;
-            text-shadow: 0 3px 0 #fff, 0 -3px 0 rgba(0,0,0,0.2);
-            position: relative;
-            z-index: 100000;
-            width: 100px;
-            height: 100px;
-            display: block;
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-       #spin:before {
-            content: "";
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 35px 25px 0 25px;
-            border-color: #E74C3C transparent transparent transparent;
-            top: -35px;
-            left: 25px;
-        }
-
-        #inner-spin {
-            width: 80px;
-            height: 80px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin: -40px 0 0 -40px;
-            border-radius: 50%;
-            background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(234,234,234,1) 100%);
-            z-index: 999;
-            box-shadow: rgba(255,255,255,1) 0px -3px 0px inset, rgba(255,255,255,1) 0px 3px 0px inset, rgba(0,0,0,0.4) 0px 0px 8px;
-        }
-
-        #spin:active #inner-spin {
-            box-shadow: rgba(0,0,0,0.4) 0px 0px 8px inset;
-        }
-
-        #spin:active:after {
-            font-size: 14px;
-        }
-
-        #shine {
-            width: 400px;
-            height: 400px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(255,255,255,0.99) 1%, rgba(255,255,255,0.91) 9%, rgba(255,255,255,0) 100%);
-            opacity: 0.2;
-            pointer-events: none;
-        }
-
-        @keyframes spinShake {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(2deg); }
-            75% { transform: rotate(-2deg); }
-        }
-
-        .spin-shake {
-            animation: spinShake 0.1s;
-        }
-
-        /* Success Popup */
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s ease;
-            z-index: 1000;
-        }
-
-        .popup-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .popup-card {
-            background: white;
-            padding: 50px 40px;
-            border-radius: 25px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-            transform: translateY(30px);
-            transition: transform 0.4s ease;
-        }
-
-        .popup-overlay.show .popup-card {
-            transform: translateY(0);
-        }
-
-        .popup-icon {
-            font-size: 4rem;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .popup-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
-
-        .popup-message {
-            font-size: 1.2rem;
-            color: #7f8c8d;
-            margin-bottom: 30px;
-        }
-
-        .popup-prize {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            display: inline-block;
-        }
-
-        .popup-button {
-            background: #2c3e50;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .popup-button:hover {
-            background: #34495e;
-            transform: translateY(-2px);
-        }
-
-        /* Notification System */
-        .notification {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            background: #e74c3c;
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-weight: 600;
-            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
-            transform: translateX(400px);
-            transition: transform 0.4s ease;
-            z-index: 1001;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        /* Responsive Design */
+        
+        /* Responsive design */
         @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-                gap: 20px;
-            }
-
-            .form-section {
-                padding: 30px 25px;
-                min-width: auto;
-            }
-
-            .wheel-section {
-                padding: 30px 20px;
-            }
-
-            .popup-card {
-                padding: 40px 30px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .title {
-                font-size: 2.5rem;
-            }
-
-            .form-section {
-                padding: 25px 20px;
-            }
+          .wheel-container {
+            width: 95vmin;
+            height: 95vmin;
+          }
+          
+          h1 {
+            font-size: 2.5rem;
+          }
+          
+          .spin-button {
+            padding: 1.2rem 2.4rem;
+            font-size: 1.6rem;
+          }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1 class="title">BUY FIRST, WIN NOW!</h1>
-            <p class="subtitle">Spin the wheel and discover your prize</p>
-        </div>
-
-        <!-- Form Section -->
-        <div class="form-section" id="formSection">
-            <div class="input-group">
-                <label class="input-label" for="customerName">Your Name</label>
-                <input type="text" id="customerName" class="input-field" placeholder="Enter your full name" required>
-            </div>
-
-            <div class="input-group">
-                <label class="input-label" for="branchSelect">Select Branch</label>
-                <select id="branchSelect" class="select-field" required>
-                    <option value="">Choose your branch</option>
-                    <option value="1">Batu Satu Branch</option>
-                    <option value="2">Madang Branch</option>
-                </select>
-            </div>
-
-            <button class="ready-button" onclick="startGame()">
-                <i class="fas fa-play"></i> Ready to Spin
-            </button>
-        </div>
-
-        <!-- Wheel Section -->
-        <div class="wheel-section" id="wheelSection">
-            <h2 class="wheel-title">Click to spin the wheel!</h2>
-            <div class="wheel-wrapper">
-                <div id="wheel">
-                    <div id="inner-wheel">
-                        <div class="sec"><span class="prize-text">GOLD</span></div>
-                        <div class="sec"><span class="prize-text">SILVER</span></div>
-                        <div class="sec"><span class="prize-text">BRONZE</span></div>
-                        <div class="sec"><span class="prize-text">GIFT</span></div>
-                        <div class="sec"><span class="prize-text">GOLD</span></div>
-                        <div class="sec"><span class="prize-text">SILVER</span></div>
-                        <div class="sec"><span class="prize-text">BRONZE</span></div>
-                        <div class="sec"><span class="prize-text">GIFT</span></div>
-                    </div>
-                    <div id="spin">
-                        <div id="inner-spin"></div>
-                    </div>
-                    <div id="shine"></div>
-                </div>
-            </div>
-        </div>
-
-    <!-- Success Popup -->
-    <div class="popup-overlay" id="successPopup">
-        <div class="popup-card">
-            <div class="popup-icon">
-                <i class="fas fa-trophy"></i>
-            </div>
-            <h2 class="popup-title" id="popupTitle">Congratulations!</h2>
-            <p class="popup-message" id="popupMessage">You've won an amazing prize!</p>
-            <div class="popup-prize" id="popupPrize">Gold Prize</div>
-            <button class="popup-button" onclick="resetGame()">Play Again</button>
-        </div>
+    <!-- Animated background dots -->
+    <div class="bg-dots"></div>
+    
+    <div class="wheel-container">
+        <svg id="wheel" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48" fill="none" stroke-width="1" stroke="currentColor" opacity="0.3"/>
+            <circle id="slice" cx="50" cy="50" r="47" fill="#001C34" />
+            <g id="slices"></g>
+            <!-- Center circle for visual appeal -->
+            <circle cx="50" cy="50" r="12" fill="var(--color-bg)" stroke="currentColor" stroke-width="2"/>
+            <circle cx="50" cy="50" r="8" fill="currentColor"/>
+        </svg>
+        
+        <button class="spin-button">SPIN!</button>
+        
+        <svg id="pin" viewBox="0 0 50 50">
+            <path d="M 45 25 L 5 10 L 5 40 Z" />
+            <circle cx="5" cy="25" r="3" fill="currentColor"/>
+        </svg>
     </div>
+    
+    <h1 class="isHidden">#FFFFFF</h1>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p2.js/0.6.0/p2.min.js"></script>
     <script>
-        // Prize Configuration
-        const PRIZES = [
-            { name: "Gold Prize M1", category: "gold", weight: 5, quantity: 2 },
-            { name: "Gold Prize B2", category: "gold", weight: 5, quantity: 1 },
-            { name: "Silver Prize M2", category: "silver", weight: 15, quantity: 5 },
-            { name: "Silver Prize B1", category: "silver", weight: 15, quantity: 3 },
-            { name: "Bronze Prize", category: "bronze", weight: 25, quantity: 10 },
-            { name: "Complimentary Gift", category: "complimentary", weight: 35, quantity: 50 }
+        // Create animated background dots
+        function createBackgroundDots() {
+            const bgDots = document.querySelector('.bg-dots');
+            for (let i = 0; i < 20; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'bg-dot';
+                dot.style.left = Math.random() * 100 + '%';
+                dot.style.top = Math.random() * 100 + '%';
+                dot.style.animationDelay = Math.random() * 6 + 's';
+                bgDots.appendChild(dot);
+            }
+        }
+        createBackgroundDots();
+
+        const containerSlices = document.querySelector('g#slices');
+        const pin = document.querySelector('svg#pin');
+        const heading = document.querySelector('h1');
+        const spinButton = document.querySelector('.spin-button');
+
+        let timeoutID = 0;
+        let isSpinning = false;
+
+        // Enhanced utility functions
+        const randomInt = (min = 0, max = 16) => Math.floor(Math.random() * (max - min) + min);
+        const randomHex = () => randomInt().toString(16);
+
+        // The "suspicious" rigged colors - wheel always lands on one of these
+        const suspicious = [
+            { rotation: 45, color: 'A2CCB6', name: 'Mint Dream' },
+            { rotation: 180, color: 'FCEEB5', name: 'Golden Hour' },
+            { rotation: 315, color: 'EE786E', name: 'Coral Sunset' }
         ];
 
-        // Game State
-        let gameState = {
-            isActive: false,
-            isSpinning: false,
-            wheelStopped: true,
-            prizes: [...PRIZES]
-        };
-
-        // Physics Configuration
-        const PHYSICS = {
-            TWO_PI: Math.PI * 2,
-            canvas: null,
-            ctx: null,
-            world: null,
-            wheel: null,
-            arrow: null,
-            mouseBody: null,
-            mouseConstraint: null,
-            viewWidth: 400,
-            viewHeight: 400,
-            ppm: 24,
-            timeStep: 1/60
-        };
-
-        // Initialize physics properties
-        PHYSICS.physicsWidth = PHYSICS.viewWidth / PHYSICS.ppm;
-        PHYSICS.physicsHeight = PHYSICS.viewHeight / PHYSICS.ppm;
-        PHYSICS.physicsCenterX = PHYSICS.physicsWidth * 0.5;
-        PHYSICS.physicsCenterY = PHYSICS.physicsHeight * 0.5;
-
-        // Game Functions
-        function startGame() {
-            const name = document.getElementById('customerName').value.trim();
-            const branch = document.getElementById('branchSelect').value;
-
-            if (!name) {
-                showNotification('Please enter your name');
-                return;
-            }
-
-            if (!branch) {
-                showNotification('Please select a branch');
-                return;
-            }
-
-            document.getElementById('formSection').style.display = 'none';
-            document.getElementById('wheelSection').style.display = 'flex';
-            
-            initializeWheel();
-            gameState.isActive = true;
+        // Add decorative dots around the wheel
+        for (let i = 0; i < 48; i += 1) {
+            const angle = (360 / 48) * i;
+            const transform = `rotate(${angle}) translate(0 -49.5) rotate(${-angle})`;
+            const dot = `<circle r="0.8" cx="50" cy="50" fill="currentColor" transform="${transform}" opacity="0.6"/>`;
+            containerSlices.innerHTML += dot;
         }
 
-        function initializeWheel() {
-            document.getElementById('spin').addEventListener('click', spinWheel);
+        // Set random background color
+        let randomFill = '';
+        for (let i = 0; i < 6; i += 1) {
+            randomFill += randomHex();
         }
+        document.querySelector('svg circle#slice').style.fill = `#${randomFill}`;
 
-        let degree = 1800;
-        let clicks = 0;
-        let isSpinning = false;
+        // Create colorful wheel slices
+        for (let i = 360; i > 0; i -= 15) {
+            const xCoor = 50 + Math.sin(i * Math.PI / 180) * 47;
+            const yCoor = 50 - Math.cos(i * Math.PI / 180) * 47;
+            const flags = i > 180 ? '0 1 1' : '0 0 1';
+
+            let fill = '';
+            for (let j = 0; j < 6; j += 1) {
+                fill += randomHex();
+            }
+
+            const suspect = suspicious.find(pairing => pairing.rotation === i);
+            if (suspect) {
+                fill = suspect.color;
+            }
+
+            const path = `
+                <path d="M 50 50 L 50 3 A 47 47 ${flags} ${xCoor} ${yCoor}" 
+                      fill="#${fill}" 
+                      stroke="rgba(255,255,255,0.1)" 
+                      stroke-width="0.5"/>
+            `;
+            containerSlices.innerHTML += path;
+        }
 
         function spinWheel() {
             if (isSpinning) return;
             
             isSpinning = true;
-            clicks++;
             
-            const newDegree = degree * clicks;
-            const extraDegree = Math.floor(Math.random() * 360) + 1;
-            const totalDegree = newDegree + extraDegree;
-            
-            document.getElementById('spin').classList.add('spin-shake');
-            setTimeout(() => {
-                document.getElementById('spin').classList.remove('spin-shake');
-            }, 100);
-            
-            document.getElementById('inner-wheel').style.transform = `rotate(${totalDegree}deg)`;
-            
-            setTimeout(() => {
-                const winningPrize = determineWinningPrize(totalDegree);
-                if (winningPrize) {
-                    showWinnerPopup(winningPrize);
-                    saveWinner(winningPrize);
-                }
+            // Remove event listeners and add spinning classes
+            [spinButton, pin].forEach(el => {
+                el.removeEventListener('click', spinWheel);
+                el.classList.add('isSpinning');
+            });
+
+            heading.classList.add('isHidden');
+
+            // Random spin parameters
+            const randomDuration = randomInt(3, 6);
+            const randomRotate = randomInt(8, 15);
+            const randomSuspect = randomInt(0, 3);
+            const selectedColor = suspicious[randomSuspect];
+
+            // Apply enhanced spinning animation
+            containerSlices.style.transformOrigin = '50%';
+            containerSlices.style.transition = `transform ${randomDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+            containerSlices.style.transform = `rotate(${randomRotate * 360 - selectedColor.rotation + 90 + randomInt(0, 360 / 24)}deg)`;
+
+            // Animate the pin
+            pin.style.animation = `pinWheel ${randomDuration / 8}s infinite ease-in-out`;
+
+            // Update theme color gradually during spin
+            let colorStep = 0;
+            const colorInterval = setInterval(() => {
+                const randomColor = `#${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}`;
+                document.documentElement.style.setProperty('--color-theme', randomColor);
+                colorStep++;
+                if (colorStep > 20) clearInterval(colorInterval);
+            }, randomDuration * 1000 / 20);
+
+            timeoutID = setTimeout(() => {
+                // Show final result
+                heading.textContent = `#${selectedColor.color}`;
+                heading.classList.remove('isHidden');
+                
+                // Stop animations
+                pin.style.animation = '';
+                
+                // Set final theme color
+                document.documentElement.style.setProperty('--color-theme', `#${selectedColor.color}`);
+
+                // Remove spinning classes and restore event listeners
+                [spinButton, pin].forEach(el => {
+                    el.classList.remove('isSpinning');
+                    el.addEventListener('click', spinWheel);
+                });
+
                 isSpinning = false;
-            }, 4000);
+                clearTimeout(timeoutID);
+            }, randomDuration * 1000);
         }
 
-        function determineWinningPrize(finalDegree) {
-            const normalizedDegree = finalDegree % 360;
-            const segmentSize = 360 / 8;
-            const segmentIndex = Math.floor(normalizedDegree / segmentSize);
-            
-            const segmentTypes = ['gold', 'silver', 'bronze', 'complimentary', 'gold', 'silver', 'bronze', 'complimentary'];
-            const targetCategory = segmentTypes[segmentIndex];
+        // Add event listeners
+        [spinButton, pin].forEach(el => {
+            el.addEventListener('click', spinWheel);
+        });
 
-            const availablePrizes = gameState.prizes.filter(prize => 
-                prize.category === targetCategory && prize.quantity > 0
-            );
-
-            if (availablePrizes.length === 0) {
-                const fallbackPrizes = gameState.prizes.filter(prize => 
-                    prize.category === 'complimentary' && prize.quantity > 0
-                );
-                if (fallbackPrizes.length > 0) {
-                    return selectRandomPrize(fallbackPrizes);
-                }
-                return null;
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                spinWheel();
             }
-
-            return selectRandomPrize(availablePrizes);
-        }
-
-        function setupPhysics() {
-            PHYSICS.world = new p2.World();
-            PHYSICS.world.solver.iterations = 100;
-            PHYSICS.world.solver.tolerance = 0;
-
-            // Materials
-            const arrowMaterial = new p2.Material();
-            const pinMaterial = new p2.Material();
-            const contactMaterial = new p2.ContactMaterial(arrowMaterial, pinMaterial, {
-                friction: 0.0,
-                restitution: 0.1
-            });
-            PHYSICS.world.addContactMaterial(contactMaterial);
-
-            // Create wheel and arrow
-            const wheelRadius = 7;
-            const wheelX = PHYSICS.physicsCenterX;
-            const wheelY = wheelRadius + 3;
-            const arrowX = wheelX;
-            const arrowY = wheelY + wheelRadius + 0.7;
-
-            PHYSICS.wheel = new WheelObject(wheelX, wheelY, wheelRadius, 8, 0.25, 6.5, pinMaterial);
-            PHYSICS.arrow = new ArrowObject(arrowX, arrowY, 0.4, 1.2, arrowMaterial);
-            PHYSICS.mouseBody = new p2.Body();
-
-            PHYSICS.world.addBody(PHYSICS.mouseBody);
-        }
-
-        function updateMousePosition(e) {
-            const rect = PHYSICS.canvas.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / PHYSICS.ppm;
-            const y = PHYSICS.physicsHeight - (e.clientY - rect.top) / PHYSICS.ppm;
-            PHYSICS.mouseBody.position[0] = x;
-            PHYSICS.mouseBody.position[1] = y;
-        }
-
-        function startDrag(e) {
-            if (!gameState.isActive) return;
-
-            if (PHYSICS.world.hitTest(PHYSICS.mouseBody.position, [PHYSICS.wheel.body])[0]) {
-                PHYSICS.mouseConstraint = new p2.RevoluteConstraint(PHYSICS.mouseBody, PHYSICS.wheel.body, {
-                    worldPivot: PHYSICS.mouseBody.position,
-                    collideConnected: false
-                });
-                PHYSICS.world.addConstraint(PHYSICS.mouseConstraint);
-            }
-
-            if (gameState.isSpinning) {
-                gameState.isSpinning = false;
-                gameState.wheelStopped = true;
-            }
-        }
-
-        function endDrag(e) {
-            if (PHYSICS.mouseConstraint) {
-                PHYSICS.world.removeConstraint(PHYSICS.mouseConstraint);
-                PHYSICS.mouseConstraint = null;
-
-                if (!gameState.isSpinning && gameState.wheelStopped) {
-                    if (Math.abs(PHYSICS.wheel.body.angularVelocity) > 6) {
-                        gameState.isSpinning = true;
-                        gameState.wheelStopped = false;
-                    }
-                }
-            }
-        }
-
-        function gameLoop() {
-            updatePhysics();
-            renderWheel();
-            requestAnimationFrame(gameLoop);
-        }
-
-        function updatePhysics() {
-            if (!PHYSICS.world) return;
-
-            PHYSICS.world.step(PHYSICS.timeStep * 0.5);
-            PHYSICS.world.step(PHYSICS.timeStep * 0.5);
-
-            if (gameState.isSpinning && !gameState.wheelStopped &&
-                PHYSICS.wheel.body.angularVelocity < 0.5 && PHYSICS.arrow.hasStopped()) {
-
-                gameState.isSpinning = false;
-                gameState.wheelStopped = true;
-                PHYSICS.wheel.body.angularVelocity = 0;
-
-                const winningPrize = determineWinningPrize();
-                if (winningPrize) {
-                    setTimeout(() => {
-                        showWinnerPopup(winningPrize);
-                        saveWinner(winningPrize);
-                    }, 800);
-                }
-            }
-        }
-
-        function determineWinningPrize() {
-            const segmentIndex = getWinningSegment();
-            const segmentTypes = ['gold', 'silver', 'bronze', 'complimentary', 'gold', 'silver', 'bronze', 'complimentary'];
-            const targetCategory = segmentTypes[segmentIndex];
-
-            const availablePrizes = gameState.prizes.filter(prize => 
-                prize.category === targetCategory && prize.quantity > 0
-            );
-
-            if (availablePrizes.length === 0) {
-                const fallbackPrizes = gameState.prizes.filter(prize => 
-                    prize.category === 'complimentary' && prize.quantity > 0
-                );
-                if (fallbackPrizes.length > 0) {
-                    return selectRandomPrize(fallbackPrizes);
-                }
-                return null;
-            }
-
-            return selectRandomPrize(availablePrizes);
-        }
-
-        function getWinningSegment() {
-            let wheelAngle = PHYSICS.wheel.body.angle % PHYSICS.TWO_PI;
-            if (wheelAngle < 0) wheelAngle += PHYSICS.TWO_PI;
-            
-            const segmentSize = PHYSICS.TWO_PI / 8;
-            return Math.floor((wheelAngle + segmentSize/2) / segmentSize) % 8;
-        }
-
-        function selectRandomPrize(availablePrizes) {
-            const randomIndex = Math.floor(Math.random() * availablePrizes.length);
-            const selectedPrize = availablePrizes[randomIndex];
-            
-            // Update quantity
-            const prizeIndex = gameState.prizes.findIndex(p => p.name === selectedPrize.name);
-            if (gameState.prizes[prizeIndex].quantity === 1) {
-                gameState.prizes.splice(prizeIndex, 1);
-            } else {
-                gameState.prizes[prizeIndex].quantity -= 1;
-            }
-            
-            return selectedPrize;
-        }
-
-        function renderWheel() {
-            PHYSICS.ctx.clearRect(0, 0, PHYSICS.viewWidth, PHYSICS.viewHeight);
-            PHYSICS.wheel.draw(PHYSICS.ctx);
-            PHYSICS.arrow.draw(PHYSICS.ctx);
-        }
-
-        function showWinnerPopup(prize) {
-            const name = document.getElementById('customerName').value;
-            
-            document.getElementById('popupTitle').textContent = `Congratulations, ${name}!`;
-            document.getElementById('popupMessage').textContent = "You've won an amazing prize!";
-            document.getElementById('popupPrize').textContent = prize.name;
-            
-            document.getElementById('successPopup').classList.add('show');
-            
-            // Launch confetti
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
-        }
-
-        function resetGame() {
-            document.getElementById('successPopup').classList.remove('show');
-            document.getElementById('wheelSection').style.display = 'none';
-            document.getElementById('formSection').style.display = 'flex';
-            
-            // Reset form
-            document.getElementById('customerName').value = '';
-            document.getElementById('branchSelect').value = '';
-            
-            // Reset game state
-            gameState.isActive = false;
-            gameState.isSpinning = false;
-            gameState.wheelStopped = true;
-        }
-
-        function saveWinner(prize) {
-            const data = {
-                customer_name: document.getElementById('customerName').value,
-                prize_name: prize.name,
-                branch_id: document.getElementById('branchSelect').value,
-                category: prize.category,
-                timestamp: new Date().toISOString()
-            };
-            
-            console.log('Winner saved:', data);
-            // Replace with actual API call
-        }
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(() => notification.classList.add('show'), 100);
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 400);
-            }, 3000);
-        }
-
-        // Wheel Object Class
-        class WheelObject {
-            constructor(x, y, radius, segments, pinRadius, pinDistance, pinMaterial) {
-                this.x = x;
-                this.y = y;
-                this.radius = radius;
-                this.segments = segments;
-                this.pinRadius = pinRadius;
-                this.pinDistance = pinDistance;
-                
-                this.pX = this.x * PHYSICS.ppm;
-                this.pY = (PHYSICS.physicsHeight - this.y) * PHYSICS.ppm;
-                this.pRadius = this.radius * PHYSICS.ppm;
-                this.deltaPI = PHYSICS.TWO_PI / this.segments;
-                
-                this.createBody();
-                this.createPins(pinMaterial);
-            }
-
-            createBody() {
-                this.body = new p2.Body({mass: 1, position: [this.x, this.y]});
-                this.body.angularDamping = 0.05;
-                this.body.addShape(new p2.Circle(this.radius));
-                this.body.shapes[0].sensor = true;
-
-                const axis = new p2.Body({position: [this.x, this.y]});
-                const constraint = new p2.LockConstraint(this.body, axis);
-                constraint.collideConnected = false;
-
-                PHYSICS.world.addBody(this.body);
-                PHYSICS.world.addBody(axis);
-                PHYSICS.world.addConstraint(constraint);
-            }
-
-            createPins(pinMaterial) {
-                this.pPinPositions = [];
-                const pin = new p2.Circle(this.pinRadius);
-                pin.material = pinMaterial;
-
-                for (let i = 0; i < this.segments; i++) {
-                    const x = Math.cos(i / this.segments * PHYSICS.TWO_PI) * this.pinDistance;
-                    const y = Math.sin(i / this.segments * PHYSICS.TWO_PI) * this.pinDistance;
-                    
-                    this.body.addShape(pin, [x, y]);
-                    this.pPinPositions[i] = [x * PHYSICS.ppm, -y * PHYSICS.ppm];
-                }
-            }
-
-            draw(ctx) {
-                ctx.save();
-                ctx.translate(this.pX, this.pY);
-
-                // Outer ring
-                const gradient = ctx.createRadialGradient(0, 0, this.pRadius, 0, 0, this.pRadius + 25);
-                gradient.addColorStop(0, '#FFD700');
-                gradient.addColorStop(1, '#B8860B');
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(0, 0, this.pRadius + 25, 0, PHYSICS.TWO_PI);
-                ctx.fill();
-
-                // Base
-                ctx.fillStyle = '#D4AF37';
-                ctx.beginPath();
-                ctx.arc(0, 0, this.pRadius + 15, 0, PHYSICS.TWO_PI);
-                ctx.fill();
-
-                ctx.rotate(-this.body.angle);
-
-                // Segments
-                const colors = ['#E74C3C', '#F39C12', '#3498DB', '#2ECC71', '#9B59B6', '#E67E22', '#1ABC9C', '#F1C40F'];
-                const labels = ['GOLD', 'SILVER', 'BRONZE', 'GIFT', 'GOLD', 'SILVER', 'BRONZE', 'GIFT'];
-
-                for (let i = 0; i < this.segments; i++) {
-                    ctx.fillStyle = colors[i];
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.pRadius, i * this.deltaPI, (i + 1) * this.deltaPI);
-                    ctx.lineTo(0, 0);
-                    ctx.closePath();
-                    ctx.fill();
-
-                    // Labels
-                    ctx.save();
-                    ctx.rotate((i + 0.5) * this.deltaPI);
-                    ctx.fillStyle = '#fff';
-                    ctx.font = 'bold 16px Poppins';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(labels[i], this.pRadius * 0.6, 4);
-                    ctx.restore();
-                }
-
-                // Pins
-                ctx.fillStyle = '#2c3e50';
-                this.pPinPositions.forEach(p => {
-                    ctx.beginPath();
-                    ctx.arc(p[0], p[1], this.pinRadius * PHYSICS.ppm, 0, PHYSICS.TWO_PI);
-                    ctx.fill();
-                });
-
-                ctx.restore();
-            }
-        }
-
-        // Arrow Object Class
-        class ArrowObject {
-            constructor(x, y, w, h, arrowMaterial) {
-                this.x = x;
-                this.y = y;
-                this.w = w;
-                this.h = h;
-                
-                this.pX = this.x * PHYSICS.ppm;
-                this.pY = (PHYSICS.physicsHeight - this.y) * PHYSICS.ppm;
-                
-                this.createBody(arrowMaterial);
-            }
-
-            createBody(arrowMaterial) {
-                this.body = new p2.Body({mass: 1, position: [this.x, this.y]});
-                
-                const verts = [
-                    [0, this.h * 0.25],
-                    [-this.w * 0.5, 0],
-                    [0, -this.h * 0.75],
-                    [this.w * 0.5, 0]
-                ];
-                
-                this.pVerts = verts.map(v => [v[0] * PHYSICS.ppm, -v[1] * PHYSICS.ppm]);
-                
-                const shape = new p2.Convex(verts);
-                shape.material = arrowMaterial;
-                this.body.addShape(shape);
-
-                const axis = new p2.Body({position: [this.x, this.y]});
-                const constraint = new p2.RevoluteConstraint(this.body, axis, {
-                    worldPivot: [this.x, this.y]
-                });
-                constraint.collideConnected = false;
-
-                // Stabilizers
-                const left = new p2.Body({position: [this.x - 1.5, this.y]});
-                const right = new p2.Body({position: [this.x + 1.5, this.y]});
-                
-                const leftConstraint = new p2.DistanceConstraint(this.body, left, {
-                    localAnchorA: [-this.w * 2, this.h * 0.25],
-                    collideConnected: false
-                });
-                const rightConstraint = new p2.DistanceConstraint(this.body, right, {
-                    localAnchorA: [this.w * 2, this.h * 0.25],
-                    collideConnected: false
-                });
-
-                leftConstraint.setStiffness(32);
-                leftConstraint.setRelaxation(4);
-                rightConstraint.setStiffness(32);
-                rightConstraint.setRelaxation(4);
-
-                PHYSICS.world.addBody(this.body);
-                PHYSICS.world.addBody(axis);
-                PHYSICS.world.addConstraint(constraint);
-                PHYSICS.world.addConstraint(leftConstraint);
-                PHYSICS.world.addConstraint(rightConstraint);
-            }
-
-            hasStopped() {
-                const angle = Math.abs(this.body.angle % PHYSICS.TWO_PI);
-                return angle < 1e-3 || (PHYSICS.TWO_PI - angle) < 1e-3;
-            }
-
-            draw(ctx) {
-                ctx.save();
-                ctx.translate(this.pX, this.pY);
-                ctx.rotate(-this.body.angle);
-
-                // Shadow
-                ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                ctx.shadowBlur = 8;
-                ctx.shadowOffsetY = 3;
-
-                // Arrow gradient
-                const gradient = ctx.createLinearGradient(0, -30, 0, 30);
-                gradient.addColorStop(0, '#E74C3C');
-                gradient.addColorStop(1, '#C0392B');
-                ctx.fillStyle = gradient;
-
-                ctx.beginPath();
-                ctx.moveTo(this.pVerts[0][0], this.pVerts[0][1]);
-                ctx.lineTo(this.pVerts[1][0], this.pVerts[1][1]);
-                ctx.lineTo(this.pVerts[2][0], this.pVerts[2][1]);
-                ctx.lineTo(this.pVerts[3][0], this.pVerts[3][1]);
-                ctx.closePath();
-                ctx.fill();
-
-                // Border
-                ctx.shadowColor = 'transparent';
-                ctx.strokeStyle = '#8B0000';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                ctx.restore();
-            }
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add enter key support for form
-            document.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && document.getElementById('formSection').style.display !== 'none') {
-                    startGame();
-                }
-            });
         });
     </script>
 </body>
