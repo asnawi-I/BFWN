@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy First, Win Now!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #63C8D8 0%, #FBFCF8 50%, #1A202C 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .title {
+            color: #FBCF8;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            color: #FBCF8;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #86BE4E;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1A202C;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FF4B33;
+            box-shadow: 0 0 10px rgba(255, 75, 51, 0.3);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #86BE4E;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1A202C;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #FF4B33;
+            box-shadow: 0 0 10px rgba(255, 75, 51, 0.3);
+        }
+
+        .spin-button {
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #FF4B33, #D81B2E);
+            color: #FBCF8;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(216, 27, 46, 0.4);
+        }
+
+        .spin-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(216, 27, 46, 0.6);
+        }
+
+        .spin-button:active {
+            transform: translateY(0);
+        }
+
+        .spin-button:disabled {
+            background: #718096;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error-message {
+            color: #FF4B33;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Buy First, Win Now!</h1>
+        
+        <form id="spinForm">
+            <div class="form-group">
+                <label for="txtboxName" class="form-label">Name:</label>
+                <input type="text" id="txtboxName" name="txtboxName" class="form-input" required>
+                <div class="error-message" id="nameError">Please enter your name</div>
+            </div>
+
+            <div class="form-group">
+                <label for="txtReceiptNo" class="form-label">Receipt No.:</label>
+                <input type="text" id="txtReceiptNo" name="txtReceiptNo" class="form-input" 
+                       placeholder="e.g. 12345678" pattern="[0-9]+" required>
+                <div class="error-message" id="receiptError">Please enter a valid receipt number (numbers only)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="branchSelect" class="form-label">Select branch:</label>
+                <select id="branchSelect" name="branchSelect" class="form-select" required>
+                    <option value="">Select Branch</option>
+                    <option value="batu-satu">Batu Satu Branch</option>
+                    <option value="madang">Madang Branch</option>
+                </select>
+                <div class="error-message" id="branchError">Please select a branch</div>
+            </div>
+
+            <button type="button" id="readyToSpin" class="spin-button">
+                Ready to Spin
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('spinForm');
+            const nameInput = document.getElementById('txtboxName');
+            const receiptInput = document.getElementById('txtReceiptNo');
+            const branchSelect = document.getElementById('branchSelect');
+            const spinButton = document.getElementById('readyToSpin');
+
+            // Receipt number validation - only allow numbers
+            receiptInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+            // Real-time validation
+            function validateField(field, errorElement, validationFn) {
+                field.addEventListener('blur', function() {
+                    if (validationFn()) {
+                        field.style.borderColor = '#86BE4E';
+                        errorElement.style.display = 'none';
+                    } else {
+                        field.style.borderColor = '#FF4B33';
+                        errorElement.style.display = 'block';
+                    }
+                });
+            }
+
+            // Validation functions
+            validateField(nameInput, document.getElementById('nameError'), 
+                () => nameInput.value.trim().length > 0);
+            
+            validateField(receiptInput, document.getElementById('receiptError'), 
+                () => /^[0-9]+$/.test(receiptInput.value) && receiptInput.value.length > 0);
+            
+            validateField(branchSelect, document.getElementById('branchError'), 
+                () => branchSelect.value !== '');
+
+            // Form submission
+            spinButton.addEventListener('click', function() {
+                let isValid = true;
+                
+                // Validate all fields
+                if (nameInput.value.trim() === '') {
+                    nameInput.style.borderColor = '#FF4B33';
+                    document.getElementById('nameError').style.display = 'block';
+                    isValid = false;
+                } else {
+                    nameInput.style.borderColor = '#86BE4E';
+                    document.getElementById('nameError').style.display = 'none';
+                }
+
+                if (!/^[0-9]+$/.test(receiptInput.value) || receiptInput.value.length === 0) {
+                    receiptInput.style.borderColor = '#FF4B33';
+                    document.getElementById('receiptError').style.display = 'block';
+                    isValid = false;
+                } else {
+                    receiptInput.style.borderColor = '#86BE4E';
+                    document.getElementById('receiptError').style.display = 'none';
+                }
+
+                if (branchSelect.value === '') {
+                    branchSelect.style.borderColor = '#FF4B33';
+                    document.getElementById('branchError').style.display = 'block';
+                    isValid = false;
+                } else {
+                    branchSelect.style.borderColor = '#86BE4E';
+                    document.getElementById('branchError').style.display = 'none';
+                }
+
+                if (isValid) {
+                    // Store form data
+                    const formData = {
+                        name: nameInput.value.trim(),
+                        receiptNo: receiptInput.value,
+                        branch: branchSelect.value
+                    };
+                    
+                    // You can store this data or pass it to the next page
+                    console.log('Form Data:', formData);
+                    
+                    // Placeholder for link - you can change this later
+                    // window.location.href = 'your-spin-page-link-here.html';
+                    alert('Form submitted successfully! Ready to spin!\n(Link will be added later)');
+                } else {
+                    // Shake effect for invalid form
+                    spinButton.style.animation = 'shake 0.5s';
+                    setTimeout(() => {
+                        spinButton.style.animation = '';
+                    }, 500);
+                }
+            });
+
+            // Add shake animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes shake {
+                    0%, 20%, 40%, 60%, 80% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

@@ -4,9 +4,16 @@
   <meta charset="UTF-8">
   <title>Login</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      background-color: #FBFCF8; /* primary white */
+      /*background-color: #FBFCF8;*/
+      background: linear-gradient(135deg, #63C8D8 0%, #FBFCF8 50%, #1A202C 100%);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -15,63 +22,98 @@
     }
 
     .login-container {
-      background-color: #86BE4E; /* red-pink */
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      width: 300px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      width: 350px;
       text-align: center;
     }
 
     .login-container h1 {
-      margin-bottom: 20px;
-      font-size: 24px;
-      color: #1A202C; /* title black */
+      margin-bottom: 30px;
+      font-size: 2rem;
+      color: #1A202C; /* primary black */
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      font-weight: bold;
     }
 
     label {
       display: block;
-      margin: 10px 0 5px;
+      margin: 15px 0 8px;
       text-align: left;
-      font-size: 14px;
-      color: #4A5568; /* dark grey text */
+      font-size: 1.1rem;
+      color: #1A202C; /* primary black */
+      font-weight: 600;
     }
 
     input[type="text"], input[type="password"] {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #718096; /* grey */
-      border-radius: 8px;
+      padding: 12px 15px;
+      border: 2px solid #86BE4E; /* green */
+      border-radius: 10px;
       outline: none;
-      font-size: 14px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      color: #1A202C;
+      transition: all 0.3s ease;
     }
 
     input[type="text"]:focus, input[type="password"]:focus {
-      border-color: #63C8D8; /* light blue accent */
+      border-color: #FF4B33; /* red-orange accent */
+      box-shadow: 0 0 10px rgba(255, 75, 51, 0.3);
     }
 
     .warning {
       margin-top: 10px;
-      font-size: 13px;
-      color: #D81B2E; /* red for warning */
+      font-size: 0.9rem;
+      color: #FF4B33; /* red-orange for warning */
       display: none; /* hidden by default */
+      background: rgba(255, 75, 51, 0.1);
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 75, 51, 0.3);
     }
 
     button {
-      margin-top: 15px;
-      padding: 10px;
+      margin-top: 20px;
+      padding: 15px 30px;
       width: 100%;
       border: none;
-      border-radius: 8px;
-      background-color: #FF4B33; /* red-orange accent */
-      color: white;
-      font-size: 16px;
+      border-radius: 15px;
+      background: linear-gradient(45deg, #FF4B33, #D81B2E);
+      color: #1A202C;
+      font-size: 1.2rem;
+      font-weight: bold;
       cursor: pointer;
       display: none; /* hidden by default */
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 15px rgba(216, 27, 46, 0.4);
     }
 
     button:hover {
-      background-color: #D81B2E; /* complimentary red */
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(216, 27, 46, 0.6);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 600px) {
+      .login-container {
+        padding: 30px 20px;
+        width: 90%;
+        max-width: 350px;
+      }
+      
+      .login-container h1 {
+        font-size: 1.8rem;
+      }
     }
   </style>
 </head>
@@ -113,7 +155,7 @@
     passwordInput.addEventListener("input", checkLogin);
 
     function goNext() {
-      window.location.href = "#"; // replace with your actual link later
+      window.location.href = "landing_page.html"; // links to landing page
     }
   </script>
 </body>
