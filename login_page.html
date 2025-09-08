@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #FBFCF8; /* primary white */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background-color: #86BE4E; /* red-pink */
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      width: 300px;
+      text-align: center;
+    }
+
+    .login-container h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #1A202C; /* title black */
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      text-align: left;
+      font-size: 14px;
+      color: #4A5568; /* dark grey text */
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #718096; /* grey */
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    input[type="text"]:focus, input[type="password"]:focus {
+      border-color: #63C8D8; /* light blue accent */
+    }
+
+    .warning {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #D81B2E; /* red for warning */
+      display: none; /* hidden by default */
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      background-color: #FF4B33; /* red-orange accent */
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: none; /* hidden by default */
+    }
+
+    button:hover {
+      background-color: #D81B2E; /* complimentary red */
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>Login</h1>
+    <label for="username">Username:</label>
+    <input type="text" id="username" placeholder="Enter username">
+    <label for="password">Password:</label>
+    <input type="password" id="password" placeholder="Enter password">
+    <p id="warning" class="warning">Invalid username or password</p>
+    <button id="confirmBtn" onclick="goNext()">Confirm</button>
+  </div>
+
+  <script>
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const warningMsg = document.getElementById('warning');
+
+    // Example username and password
+    const correctUser = "admin";
+    const correctPass = "1234";
+
+    function checkLogin() {
+      if (usernameInput.value === correctUser && passwordInput.value === correctPass) {
+        confirmBtn.style.display = "block";
+        warningMsg.style.display = "none";
+      } else if (usernameInput.value !== "" || passwordInput.value !== "") {
+        confirmBtn.style.display = "none";
+        warningMsg.style.display = "block";
+      } else {
+        confirmBtn.style.display = "none";
+        warningMsg.style.display = "none";
+      }
+    }
+
+    usernameInput.addEventListener("input", checkLogin);
+    passwordInput.addEventListener("input", checkLogin);
+
+    function goNext() {
+      window.location.href = "#"; // replace with your actual link later
+    }
+  </script>
+</body>
+</html>
