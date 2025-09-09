@@ -226,92 +226,76 @@
         const randomHex = () => randomInt().toString(16);
 
         const suspicious = [
-    { rotation: 0, color: 'A2CCB6', name: 'Prize 1' },
-    { rotation: 45, color: 'FF6B6B', name: 'Prize 2' },
-    { rotation: 90, color: '4ECDC4', name: 'Prize 3' },
-    { rotation: 135, color: 'FCEEB5', name: 'Prize 4' },
-    { rotation: 180, color: '95E1D3', name: 'Prize 5' },
-    { rotation: 225, color: 'F38BA8', name: 'Prize 6' },
-    { rotation: 270, color: 'EE786E', name: 'Prize 7' },
-    { rotation: 315, color: 'A8E6CF', name: 'Prize 8' }
-];
+            { rotation: 0, color: 'A2CCB6', name: 'Prize 1' },
+            { rotation: 45, color: 'FF6B6B', name: 'Prize 2' },
+            { rotation: 90, color: '4ECDC4', name: 'Prize 3' },
+            { rotation: 135, color: 'FCEEB5', name: 'Prize 4' },
+            { rotation: 180, color: '95E1D3', name: 'Prize 5' },
+            { rotation: 225, color: 'F38BA8', name: 'Prize 6' },
+            { rotation: 270, color: 'EE786E', name: 'Prize 7' },
+            { rotation: 315, color: 'A8E6CF', name: 'Prize 8' }
+        ];
 
         const allPrizes = [];
         for (let i = 1; i <= 100; i++){
-            allPrizes.push(`Prize${i}`);
+            allPrizes.push(`Prize ${i}`);
         }
         allPrizes.push("JACKPOT", "BONUS", "MEGA PRIZE", "SUPER PRIZE", "LUCKY WIN");
 
-
-        for (let i = 0; i < 48; i += 1) {
-            const angle = (360 / 48) * i;
-            const transform = `rotate(${angle}) translate(0 -49.5) rotate(${-angle})`;
-            const dot = `<circle r="0.8" cx="50" cy="50" fill="currentColor" transform="${transform}" opacity="0.6"/>`;
-            containerSlices.innerHTML += dot;
-        }
 
         // Set random background color
         let randomFill = '';
         for (let i = 0; i < 6; i += 1) {
             randomFill += randomHex();
         }
-        document.querySelector('svg circle#slice').style.fill = `#${randomFill}`;
+        // Hide the background circle
+        document.querySelector('svg circle#slice').style.display = 'none';
 
-        // Create colorful wheel slices
-        for (let i = 360; i > 0; i -= 15) {
-            const xCoor = 50 + Math.sin(i * Math.PI / 180) * 47;
-            const yCoor = 50 - Math.cos(i * Math.PI / 180) * 47;
-            const flags = i > 180 ? '0 1 1' : '0 0 1';
+// Create 8 clean slices
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
 
-            let fill = '';
-            let label = '';
+        for (let i = 0; i < 8; i++) {
+            const startAngle = (i * 45 - 22.5) * Math.PI / 180;
+            const endAngle = ((i + 1) * 45 - 22.5) * Math.PI / 180;
 
-
-            for (let j = 0; j < 6; j += 1) {
-                fill += randomHex();
-            }
-
-            const suspect = suspicious.find(pairing => pairing.rotation === i);
-            if (suspect) {
-                fill = suspect.color;
-                label = suspect.name;
-            }
+            const x1 = 50 + Math.cos(startAngle) * 46;
+            const y1 = 50 + Math.sin(startAngle) * 46;
+            const x2 = 50 + Math.cos(endAngle) * 46;
+            const y2 = 50 + Math.sin(endAngle) * 46;
 
             const path = `
-                <path d="M 50 50 L 50 3 A 47 47 ${flags} ${xCoor} ${yCoor}" 
-                      fill="#${fill}" 
-                      stroke="rgba(255,255,255,0.1)" 
-                      stroke-width="0.5"/>
+        <path d="M 50 50 L ${x1} ${y1} A 46 46 0 0 1 ${x2} ${y2} Z" 
+              fill="${colors[i]}" 
+              stroke="white" 
+              stroke-width="0.5"/>
             `;
             containerSlices.innerHTML += path;
 
-            if (label) {
-    const textAngle = i - 7.5; 
-    const textRadius = 25; 
-    const textX = 50 + Math.sin(textAngle * Math.PI / 180) * textRadius;
-    const textY = 50 - Math.cos(textAngle * Math.PI / 180) * textRadius;
+    // Add prize text - centered in each slice
+            const midAngle = (i * 45) * Math.PI / 180; 
+    const textX = 50 + Math.cos(midAngle) * 28; // Distance from center
+    const textY = 50 + Math.sin(midAngle) * 28;
     
     const textElement = `
         <text x="${textX}" y="${textY}" 
               text-anchor="middle" 
               dominant-baseline="middle"
               fill="white" 
-              font-size="2.5" 
+              font-size="2.8" 
               font-weight="bold"
               font-family="Poppins"
-              stroke="#333" 
+              stroke="#000"
               stroke-width="0.1"
-              transform="rotate(${textAngle + 90} ${textX} ${textY})">${label}</text>
+              class="prize-text">Prize  ${Math.floor(Math.random() * 100) + 1}</text>
     `;
     containerSlices.innerHTML += textElement;
-            }
-        }
+}
 
-        let textUpdateInterval;
+let textUpdateInterval;
 
 function startPrizeAnimation() {
     textUpdateInterval = setInterval(() => {
-        const textElements = containerSlices.querySelectorAll('text');
+        const textElements = containerSlices.querySelectorAll('.prize-text');
         textElements.forEach(textEl => {
             const randomPrize = allPrizes[Math.floor(Math.random() * allPrizes.length)];
             textEl.textContent = randomPrize;
@@ -325,81 +309,138 @@ function stopPrizeAnimation() {
     }
 }
 
-        function spinWheel() {
-            if (isSpinning) return;
+function spinWheel() {
+    if (isSpinning) return;
+
+
+    isSpinning = true;
+
+    startPrizeAnimation();
+
+    [spinButton, pin].forEach(el => {
+        el.removeEventListener('click', spinWheel);
+        el.classList.add('isSpinning');
+    });
+
+    heading.classList.add('isHidden');
+
+        
+    const randomDuration = 6;
+    const randomRotate = randomInt(8, 15);
+
+    containerSlices.style.transition = 'none';
+    containerSlices.style.transform = 'rotate(0deg)';
+    containerSlices.offsetHeight;
+
+    const finalPrizeNumber = randomInt(1, 101);
+    const finalPrizeText = `Prize ${finalPrizeNumber}`;
+    const targetSlice = randomInt(0, 8);
+    const targetRotation = targetSlice * 45;
+    const textElements = containerSlices.querySelectorAll('.prize-text');
+
+    setTimeout(() => {    
+    containerSlices.style.transformOrigin = '50%';
+    containerSlices.style.transition = `transform ${randomDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+    
+
+    containerSlices.style.transform = `rotate(${3600 - targetRotation}deg)`;
             
-            isSpinning = true;
-            
-            startPrizeAnimation();
+    }, 50);
 
-            [spinButton, pin].forEach(el => {
-                el.removeEventListener('click', spinWheel);
-                el.classList.add('isSpinning');
-            });
+    pin.style.animation = `pinWheel ${randomDuration / 8}s infinite ease-in-out`;
 
-            heading.classList.add('isHidden');
 
-            // Random spin parameters
-            const randomDuration = 6;
-            const randomRotate = randomInt(8, 15);
-            const randomSuspect = randomInt(0, 8);
-            const selectedColor = suspicious[randomSuspect];
-
-            // Apply enhanced spinning animation
-            containerSlices.style.transformOrigin = '50%';
-            containerSlices.style.transition = `transform ${randomDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
-            containerSlices.style.transform = `rotate(${randomRotate * 360 - selectedColor.rotation + randomInt(0, 360 / 24)}deg)`;
-
-            // Animate the pin
-            pin.style.animation = `pinWheel ${randomDuration / 8}s infinite ease-in-out`;
 
             // Update theme color gradually during spin
-            let colorStep = 0;
-            const colorInterval = setInterval(() => {
-                const randomColor = `#${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}`;
-                document.documentElement.style.setProperty('--color-theme', randomColor);
-                colorStep++;
-                if (colorStep > 20) clearInterval(colorInterval);
-            }, randomDuration * 1000 / 20);
+    let colorStep = 0;
+    const colorInterval = setInterval(() => {
+        const randomColor = `#${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}`;
+        document.documentElement.style.setProperty('--color-theme', randomColor);
+        colorStep++;
+        if (colorStep > 20) clearInterval(colorInterval);
+    }, randomDuration * 1000 / 20);
 
-            timeoutID = setTimeout(() => {
+    timeoutID = setTimeout(() => {
+        stopPrizeAnimation();
 
 
-                stopPrizeAnimation();
+        setTimeout(() => {
+            const transformStyle = containerSlices.style.transform;
+            const rotationMatch = transformStyle.match(/rotate\(([^]+)deg\)/);
+            const currentRotation = rotationMatch ? parseFloat(rotationMatch[1] % 360) : 0;
 
-                // Show final result
-                heading.textContent = selectedColor.name;
-                heading.classList.remove('isHidden');
-                
-                // Stop animations
-                pin.style.animation = '';
-                
-                // Set final theme color
-                document.documentElement.style.setProperty('--color-theme', `#${selectedColor.color}`);
+            const textElements = containerSlices.querySelectorAll('.prize-text');
+            textElements.forEach((textEl) => {
+                const x = parseFloat(textEl.getAttribute('x'));
+                const y = parseFloat(textEl.getAttribute('y'));
+                textEl.setAttribute('transform', `rotate(${-currentRotation}, ${x}, ${y})`);
+            });
+            
+            let closestElement = null;
+            let minDistance = Infinity;
 
-                [spinButton, pin].forEach(el => {
-                    el.classList.remove('isSpinning');
-                    el.addEventListener('click', spinWheel);
-                });
+            const pinX = 50; 
+            const pinY = 22; 
 
-                isSpinning = false;
-                clearTimeout(timeoutID);
-            }, randomDuration * 1000);
-        }
+    
+    textElements.forEach((textEl, index) => {
+    const x = parseFloat(textEl.getAttribute('x'));
+    const y = parseFloat(textEl.getAttribute('y'));
+   
+    const transformStyle = containerSlices.style.transform;
+    const rotationMatch = transformStyle.match(/rotate\(([^)]+)deg\)/);
+    const currentRotation = rotationMatch ? parseFloat(rotationMatch[1] % 360) : 0;
+    
+    const rotationRad = (currentRotation * Math.PI) / 180;
+    const centerX = 50, centerY = 50;
+    
+
+    const rotatedX = centerX + (x - centerX) * Math.cos(rotationRad) - (y - centerY) * Math.sin(rotationRad);
+    const rotatedY = centerY + (x - centerX) * Math.sin(rotationRad) + (y - centerY) * Math.cos(rotationRad);
+    
+    const distance = Math.sqrt((rotatedX - pinX) ** 2 + (rotatedY - pinY) ** 2);
+    
+    
+    if (distance < minDistance) {
+        minDistance = distance;
+        closestElement = textEl;
+    }
+});
+    
+    
+    const finalPrize = closestElement ? closestElement.textContent : `Prize ${randomInt(1, 101)}`;
+    
+    heading.textContent = finalPrize;
+    heading.classList.remove('isHidden');
+    
+}, 100);
+
+        pin.style.animation = '';
 
         [spinButton, pin].forEach(el => {
+            el.classList.remove('isSpinning');
             el.addEventListener('click', spinWheel);
         });
 
-        
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.code === 'Enter') {
-                e.preventDefault();
-                spinWheel();
-            }
-        });
-    </script>
+        isSpinning = false;
+        clearTimeout(timeoutID);
+    }, randomDuration * 1000);
+}
+
+[spinButton, pin].forEach(el => {
+    el.addEventListener('click', spinWheel);
+});
+
+
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.code === 'Enter') {
+        e.preventDefault();
+        spinWheel();
+    }
+});
+</script>
 </body>
 </html>
 
+ 
 
