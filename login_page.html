@@ -3,160 +3,225 @@
 <head>
   <meta charset="UTF-8">
   <title>Login</title>
+
   <style>
-    * {
+    /*==========================
+      Theme Variables
+    ==========================*/
+    :root {
+      --bg-gradient: linear-gradient(135deg, #63C8D8 0%, #FBFCF8 50%, #1A202C 100%);
+      --primary-color: #1A202C;
+      --accent-green: #86BE4E;
+      --accent-error: #FF4B33;
+      --container-bg: rgba(255,255,255,0.15);
+      --font-family: Arial, sans-serif;
+    }
+
+    /*==========================
+      Global Reset
+    ==========================*/
+    *, *::before, *::after {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      font-family: Arial, sans-serif;
-      /*background-color: #FBFCF8;*/
-      background: linear-gradient(135deg, #63C8D8 0%, #FBFCF8 50%, #1A202C 100%);
+      font-family: var(--font-family);
+      background: var(--bg-gradient);
       display: flex;
+      place-items: center;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      min-height: 100vh;
     }
 
+    /*==========================
+      Container
+    ==========================*/
     .login-container {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--container-bg);
       backdrop-filter: blur(10px);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      width: 350px;
+      padding: 2.5rem;
+      border-radius: 1.25rem;
+      width: 100%;
+      max-width: 350px;
       text-align: center;
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+      border: 1px solid rgba(255,255,255,0.2);
     }
 
     .login-container h1 {
-      margin-bottom: 30px;
-      font-size: 2rem;
-      color: #1A202C; /* primary black */
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-      font-weight: bold;
+      margin-bottom: 1.5rem;
+      color: var(--primary-color);
+      font-size: 1.75rem;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    /*==========================
+      Form Elements
+    ==========================*/
+    .form-group {
+      margin-bottom: 1rem;
+      text-align: left;
     }
 
     label {
       display: block;
-      margin: 15px 0 8px;
-      text-align: left;
-      font-size: 1.1rem;
-      color: #1A202C; /* primary black */
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
       font-weight: 600;
     }
 
-    input[type="text"], input[type="password"] {
+    input {
       width: 100%;
-      padding: 12px 15px;
-      border: 2px solid #86BE4E; /* green */
-      border-radius: 10px;
-      outline: none;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--accent-green);
+      border-radius: 0.625rem;
       font-size: 1rem;
-      background: rgba(255, 255, 255, 0.9);
-      color: #1A202C;
-      transition: all 0.3s ease;
+      background: #fff;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
 
-    input[type="text"]:focus, input[type="password"]:focus {
-      border-color: #FF4B33; /* red-orange accent */
-      box-shadow: 0 0 10px rgba(255, 75, 51, 0.3);
+    input:focus {
+      border-color: var(--accent-error);
+      box-shadow: 0 0 8px rgba(255, 75, 51, 0.3);
+      outline: none;
     }
 
-    .warning {
-      margin-top: 10px;
-      font-size: 0.9rem;
-      color: #FF4B33; /* red-orange for warning */
-      display: none; /* hidden by default */
-      background: rgba(255, 75, 51, 0.1);
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 75, 51, 0.3);
+    /*==========================
+      Error Message
+    ==========================*/
+    #warning {
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--accent-error);
+      background: rgba(255,75,51,0.1);
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255,75,51,0.3);
+      display: none;
     }
 
+    /*==========================
+      Button
+    ==========================*/
     button {
-      margin-top: 20px;
-      padding: 15px 30px;
       width: 100%;
+      padding: 0.75rem;
+      margin-top: 1.25rem;
       border: none;
-      border-radius: 15px;
-      background: linear-gradient(45deg, #86BE4E);
-      color: #1A202C;
-      font-size: 1.2rem;
+      border-radius: 0.9375rem;
+      background: var(--accent-green);
+      color: var(--primary-color);
+      font-size: 1.1rem;
       font-weight: bold;
       cursor: pointer;
-      display: none; /* hidden by default */
-      transition: all 0.3s ease;
       text-transform: uppercase;
       letter-spacing: 1px;
-      box-shadow: 0 4px 15px rgba(216, 27, 46, 0.4);
+      box-shadow: 0 4px 15px rgba(31,38,135,0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    button:hover {
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button:not(:disabled):hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(216, 27, 46, 0.6);
+      box-shadow: 0 6px 20px rgba(31,38,135,0.3);
     }
 
-    button:active {
-      transform: translateY(0);
-    }
-
+    /*==========================
+      Responsive
+    ==========================*/
     @media (max-width: 600px) {
       .login-container {
-        padding: 30px 20px;
-        width: 90%;
-        max-width: 350px;
+        padding: 2rem;
       }
-      
+
       .login-container h1 {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="login-container">
-    <h1>Login</h1>
-    <label for="username">Username:</label>
-    <input type="text" id="username" placeholder="Enter username">
-    <label for="password">Password:</label>
-    <input type="password" id="password" placeholder="Enter password">
-    <p id="warning" class="warning">Invalid username or password</p>
-    <button id="confirmBtn" onclick="goNext()">Confirm</button>
+    <h1 id="loginHeading">Login to Your Account</h1>
+
+    <form id="loginForm" aria-labelledby="loginHeading" novalidate>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Enter username"
+          autocomplete="username"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Enter password"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <div id="warning" role="alert" aria-live="assertive">
+        Invalid username or password.
+      </div>
+
+      <button type="submit" id="confirmBtn" disabled>
+        Confirm
+      </button>
+    </form>
   </div>
 
   <script>
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
-    const confirmBtn = document.getElementById('confirmBtn');
-    const warningMsg = document.getElementById('warning');
+    (function() {
+      const form        = document.getElementById('loginForm');
+      const usernameEl  = document.getElementById('username');
+      const passwordEl  = document.getElementById('password');
+      const warningEl   = document.getElementById('warning');
+      const submitBtn   = document.getElementById('confirmBtn');
 
-    // Example username and password
-    const correctUser = "admin";
-    const correctPass = "1234";
+      const VALID_CRED = { user: 'admin', pass: '1234' };
 
-    function checkLogin() {
-      if (usernameInput.value === correctUser && passwordInput.value === correctPass) {
-        confirmBtn.style.display = "block";
-        warningMsg.style.display = "none";
-      } else if (usernameInput.value !== "" || passwordInput.value !== "") {
-        confirmBtn.style.display = "none";
-        warningMsg.style.display = "block";
-      } else {
-        confirmBtn.style.display = "none";
-        warningMsg.style.display = "none";
+      // Enable button when both fields are non-empty
+      function updateButtonState() {
+        submitBtn.disabled = !(usernameEl.value && passwordEl.value);
+        warningEl.style.display = 'none';
       }
-    }
 
-    usernameInput.addEventListener("input", checkLogin);
-    passwordInput.addEventListener("input", checkLogin);
+      usernameEl.addEventListener('input', updateButtonState);
+      passwordEl.addEventListener('input', updateButtonState);
 
-    function goNext() {
-      window.location.href = "landing_page.html"; // links to landing page
-    }
+      // Handle form submit
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const isValid = 
+          usernameEl.value === VALID_CRED.user &&
+          passwordEl.value === VALID_CRED.pass;
+
+        if (isValid) {
+          // In real apps, send credentials to server via AJAX
+          window.location.href = 'landing_page.html';
+        } else {
+          warningEl.style.display = 'block';
+          submitBtn.disabled = true;
+        }
+      });
+    })();
   </script>
 </body>
 </html>
