@@ -312,9 +312,6 @@ function stopPrizeAnimation() {
 function spinWheel() {
     if (isSpinning) return;
 
-    console.log("spin start!");
-    console.log("current transform:", containerSlices.style.transform);
-    console.log("current transition:", containerSlices.style.transition);
 
     isSpinning = true;
 
@@ -331,11 +328,9 @@ function spinWheel() {
     const randomDuration = 6;
     const randomRotate = randomInt(8, 15);
 
-    console.log("resetting wheel...");
     containerSlices.style.transition = 'none';
     containerSlices.style.transform = 'rotate(0deg)';
     containerSlices.offsetHeight;
-    console.log("reset complete, starting spin...")
 
     const finalPrizeNumber = randomInt(1, 101);
     const finalPrizeText = `Prize ${finalPrizeNumber}`;
@@ -347,8 +342,6 @@ function spinWheel() {
     containerSlices.style.transformOrigin = '50%';
     containerSlices.style.transition = `transform ${randomDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
     
-    console.log("setting new transform:", `rotate(${randomRotate * 360 - targetRotation}deg)`);
-    console.log("Duration:", randomDuration);
 
     containerSlices.style.transform = `rotate(${3600 - targetRotation}deg)`;
             
@@ -372,14 +365,23 @@ function spinWheel() {
 
 
         setTimeout(() => {
+            const transformStyle = containerSlices.style.transform;
+            const rotationMatch = transformStyle.match(/rotate\(([^]+)deg\)/);
+            const currentRotation = rotationMatch ? parseFloat(rotationMatch[1] % 360) : 0;
+
             const textElements = containerSlices.querySelectorAll('.prize-text');
+            textElements.forEach((textEl) => {
+                const x = parseFloat(textEl.getAttribute('x'));
+                const y = parseFloat(textEl.getAttribute('y'));
+                textEl.setAttribute('transform', `rotate(${-currentRotation}, ${x}, ${y})`);
+            });
+            
             let closestElement = null;
             let minDistance = Infinity;
 
             const pinX = 50; 
             const pinY = 22; 
 
-    console.log("Pin position:", pinX, pinY); // Debug log
     
     textElements.forEach((textEl, index) => {
     const x = parseFloat(textEl.getAttribute('x'));
@@ -398,7 +400,6 @@ function spinWheel() {
     
     const distance = Math.sqrt((rotatedX - pinX) ** 2 + (rotatedY - pinY) ** 2);
     
-    console.log(`Slice ${index}: text="${textEl.textContent}" rotated=(${rotatedX.toFixed(1)},${rotatedY.toFixed(1)}) distance=${distance.toFixed(2)}`);
     
     if (distance < minDistance) {
         minDistance = distance;
@@ -406,7 +407,6 @@ function spinWheel() {
     }
 });
     
-    console.log("Closest element:", closestElement ? closestElement.textContent : "none", "distance:", minDistance); // Debug log
     
     const finalPrize = closestElement ? closestElement.textContent : `Prize ${randomInt(1, 101)}`;
     
@@ -441,4 +441,6 @@ document.addEventListener('keydown', (e) => {
 </script>
 </body>
 </html>
+
+ 
 
