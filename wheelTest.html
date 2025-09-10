@@ -51,7 +51,7 @@
 
       h1 {
           position: absolute;
-          top: 2rem;
+          top: 3rem;
           left: 50%;
           transform: translateX(-50%);
           font-size: 4rem;
@@ -61,11 +61,16 @@
           z-index: 10;
       }
 
-      h1.isHidden {
-          opacity: 0;
-          visibility: hidden;
-          transform: translateX(-50%) translateY(-2rem) scale(0.5);
+      h1.main-title {
+        font-size: 100px;
+        margin-top: auto;
+        margin-bottom: auto;
+        color: #ea3b52;   
+        font-weight: bold;
+        text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+        white-space: nowrap;
       }
+
 
       .wheel-container {
           position: absolute;
@@ -159,6 +164,142 @@
           75% { transform: translateX(-50%) rotate(105deg); }
       }
 
+      /*popup modal*/
+      .popup-overlay {
+        position: fixed;
+        top: 220px;
+        left: 200px;
+        width: 70%;
+        height: 45%;
+        display: flex;
+        justify-content: center;
+        text-items: center;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .popup-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .popup-content {
+    background: white;
+    border: 4px solid #4CAF50;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transform: scale(0.7);
+    transition: transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.popup-header {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #333;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.popup-body {
+    padding: 2rem;
+    background: #f1f8e9;
+}
+
+.popup-message {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.popup-prize {
+    color: #2e7d32;
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin: 1rem 0;
+    font-family: var(--font-fun);
+}
+
+.popup-description {
+    color: #666;
+    font-size: 0.95rem;
+    margin-top: 1rem;
+}
+
+.popup-buttons {
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.popup-btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+
+.popup-btn.secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.popup-btn.secondary:hover {
+    background: #5a6268;
+}
+
+      .popup-overlay.show .popup-content {
+        transform: scale(1.0);
+      }
+
+      .popup-title {
+        color: var(--color-theme);
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        font-family: var(--font-fun);
+      }
+
+      .popup-prize {
+        color: #333;
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 1rem 0;
+        font-family: var(--font-fun);
+      }
+
+      .popup-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: none;
+        border: none;
+        font-size: 2rem;
+        cursor: pointer;
+        color: #666;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .popup-close:hover {
+        color: var(--color-theme);
+      }
+
       /* Responsive design */
       @media (max-width: 768px) {
           .wheel-container {
@@ -197,7 +338,7 @@
         </svg>
     </div>
     
-    <h1 class="isHidden">Prize 1</h1>
+    <h1 class="main-title">Buy First, Win Now!</h1>
 
     <script>
         // Create animated background dots
@@ -213,6 +354,34 @@
             }
         }
         createBackgroundDots();
+
+       document.body.insertAdjacentHTML('beforeend', `
+    <div class="popup-overlay" id="prizePopup">
+        <div class="popup-content">
+            <div class="popup-header">  congraotulations! </div>
+            <div class="popup-body">
+                <div class="popup-message">You have won:</div>
+                <div class="popup-prize" id="popupPrizeText">Prize 1</div>
+                <div class="popup-description">womp womp</div>
+            </div>
+            <div class="popup-buttons">
+                <button class="popup-btn secondary" onclick="closePrizePopup()">Close</button>
+            </div>
+        </div>
+    </div>
+`);
+
+        function showPrizePopup(prize) {
+            document.getElementById('popupPrizeText').textContent = prize;
+            document.getElementById('prizePopup').classList.add('show');
+
+        }
+
+
+        function closePrizePopup() {
+            document.getElementById('prizePopup').classList.remove('show');
+
+        }
 
         const containerSlices = document.querySelector('g#slices');
         const pin = document.querySelector('svg#pin');
@@ -271,7 +440,6 @@
             `;
             containerSlices.innerHTML += path;
 
-    // Add prize text - centered in each slice
             const midAngle = (i * 45) * Math.PI / 180; 
     const textX = 50 + Math.cos(midAngle) * 28; // Distance from center
     const textY = 50 + Math.sin(midAngle) * 28;
@@ -300,7 +468,7 @@ function startPrizeAnimation() {
             const randomPrize = allPrizes[Math.floor(Math.random() * allPrizes.length)];
             textEl.textContent = randomPrize;
         });
-    }, 100);
+    }, 50);
 }
 
 function stopPrizeAnimation() {
@@ -322,10 +490,8 @@ function spinWheel() {
         el.classList.add('isSpinning');
     });
 
-    heading.classList.add('isHidden');
-
         
-    const randomDuration = 6;
+    const randomDuration = 4;
     const randomRotate = randomInt(8, 15);
 
     containerSlices.style.transition = 'none';
@@ -360,71 +526,69 @@ function spinWheel() {
         if (colorStep > 20) clearInterval(colorInterval);
     }, randomDuration * 1000 / 20);
 
-    timeoutID = setTimeout(() => {
-        stopPrizeAnimation();
 
 
-        setTimeout(() => {
-            const transformStyle = containerSlices.style.transform;
-            const rotationMatch = transformStyle.match(/rotate\(([^]+)deg\)/);
-            const currentRotation = rotationMatch ? parseFloat(rotationMatch[1] % 360) : 0;
-
-            const textElements = containerSlices.querySelectorAll('.prize-text');
-            textElements.forEach((textEl) => {
-                const x = parseFloat(textEl.getAttribute('x'));
-                const y = parseFloat(textEl.getAttribute('y'));
-                textEl.setAttribute('transform', `rotate(${-currentRotation}, ${x}, ${y})`);
-            });
-            
-            let closestElement = null;
-            let minDistance = Infinity;
-
-            const pinX = 50; 
-            const pinY = 22; 
-
+setTimeout(() => {
+    stopPrizeAnimation();
     
-    textElements.forEach((textEl, index) => {
-    const x = parseFloat(textEl.getAttribute('x'));
-    const y = parseFloat(textEl.getAttribute('y'));
-   
     const transformStyle = containerSlices.style.transform;
     const rotationMatch = transformStyle.match(/rotate\(([^)]+)deg\)/);
-    const currentRotation = rotationMatch ? parseFloat(rotationMatch[1] % 360) : 0;
+    const currentRotation = rotationMatch ? parseFloat(rotationMatch[1]) : 0;
     
-    const rotationRad = (currentRotation * Math.PI) / 180;
-    const centerX = 50, centerY = 50;
-    
+    const textElements = containerSlices.querySelectorAll('.prize-text');
+    textElements.forEach((textEl) => {
+        const x = parseFloat(textEl.getAttribute('x'));
+        const y = parseFloat(textEl.getAttribute('y'));
+        textEl.setAttribute('transform', `rotate(${-currentRotation}, ${x}, ${y})`);
+    });
+}, randomDuration * 1000 * 0.5);
 
-    const rotatedX = centerX + (x - centerX) * Math.cos(rotationRad) - (y - centerY) * Math.sin(rotationRad);
-    const rotatedY = centerY + (x - centerX) * Math.sin(rotationRad) + (y - centerY) * Math.cos(rotationRad);
-    
-    const distance = Math.sqrt((rotatedX - pinX) ** 2 + (rotatedY - pinY) ** 2);
-    
-    
-    if (distance < minDistance) {
-        minDistance = distance;
-        closestElement = textEl;
-    }
-});
-    
+timeoutID = setTimeout(() => {
+    pin.style.animation = '';
+
+    // Detect winner
+    const textElements = containerSlices.querySelectorAll('.prize-text');
+    let closestElement = null;
+    let minDistance = Infinity;
+    const pinX = 50; 
+    const pinY = 22; 
+
+    textElements.forEach((textEl) => {
+        const x = parseFloat(textEl.getAttribute('x'));
+        const y = parseFloat(textEl.getAttribute('y'));
+       
+        const transformStyle = containerSlices.style.transform;
+        const rotationMatch = transformStyle.match(/rotate\(([^)]+)deg\)/);
+        const currentRotation = rotationMatch ? parseFloat(rotationMatch[1] % 360) : 0;
+        
+        const rotationRad = (currentRotation * Math.PI) / 180;
+        const centerX = 50, centerY = 50;
+        
+        const rotatedX = centerX + (x - centerX) * Math.cos(rotationRad) - (y - centerY) * Math.sin(rotationRad);
+        const rotatedY = centerY + (x - centerX) * Math.sin(rotationRad) + (y - centerY) * Math.cos(rotationRad);
+        
+        const distance = Math.sqrt((rotatedX - pinX) ** 2 + (rotatedY - pinY) ** 2);
+        
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestElement = textEl;
+        }
+    });
     
     const finalPrize = closestElement ? closestElement.textContent : `Prize ${randomInt(1, 101)}`;
     
-    heading.textContent = finalPrize;
-    heading.classList.remove('isHidden');
-    
-}, 100);
+    setTimeout(() => {
+        showPrizePopup(finalPrize);
+    }, 1000);
 
-        pin.style.animation = '';
+    [spinButton, pin].forEach(el => {
+        el.classList.remove('isSpinning');
+        el.addEventListener('click', spinWheel);
+    });
 
-        [spinButton, pin].forEach(el => {
-            el.classList.remove('isSpinning');
-            el.addEventListener('click', spinWheel);
-        });
-
-        isSpinning = false;
-        clearTimeout(timeoutID);
-    }, randomDuration * 1000);
+    isSpinning = false;
+    clearTimeout(timeoutID);
+}, randomDuration * 1000);
 }
 
 [spinButton, pin].forEach(el => {
