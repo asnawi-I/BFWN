@@ -128,6 +128,8 @@
             display: none;
         }
 
+        
+
         @media (max-width: 600px) {
             .container {
                 padding: 30px 20px;
@@ -251,10 +253,10 @@
                     
                     // You can store this data or pass it to the next page
                     console.log('Form Data:', formData);
-                    
-                    // Placeholder for link - you can change this later
-                    // window.location.href = 'your-spin-page-link-here.html';
-                    alert('Form submitted successfully! Ready to spin!\n(Link will be added later)');
+
+                    sessionStorage.setItem('userFormData', JSON.stringify(formData));
+
+                    window.location.href = 'wheelTest.html'; 
                 } else {
                     // Shake effect for invalid form
                     spinButton.style.animation = 'shake 0.5s';

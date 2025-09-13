@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Wheel Spinner</title>
+    <title>Wheel Spinner</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Alegreya+Sans+SC:wght@400;900&display=swap");
         
@@ -22,32 +22,13 @@
       }
 
       body {
+          background-image: url('Background.png');
           height: 100vh;
-          background: var(--color-bg);
           color: var(--color-theme);
           font-family: var(--font-main);
           overflow: hidden;
       }
 
-      /* Animated background dots */
-      .bg-dots {
-          none;
-      }
-
-      .bg-dot {
-          position: absolute;
-          width: 3px;
-          height: 3px;
-          background: var(--color-theme);
-          border-radius: 50%;
-          opacity: 0.3;
-          animation: float 6s infinite ease-in-out;
-      }
-
-      @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
-          50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
-      }
 
       h1 {
           position: absolute;
@@ -63,22 +44,38 @@
 
       h1.main-title {
         font-size: 100px;
-        margin-top: auto;
+        margin-top: -25px;
         margin-bottom: auto;
         color: #ea3b52;   
         font-weight: bold;
         text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
         white-space: nowrap;
+        z-index: 15;
+        letter-spacing: 2px;
       }
 
 
+
       .wheel-container {
-          position: absolute;
-          left: 50%;
-          bottom: -80%;
-          transform: translateX(-50%);
-          width: 150vmin;
-          height: 150vmin;
+        position: absolute;
+        left: 50%;
+        bottom: -80%;
+        transform: translateX(-50%);
+        width: 150vmin;
+        height: 150vmin;
+        filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
+    }
+
+      .wheel-container::before {
+        content: '';
+        position: absolute;
+        top: 0px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        background: #ffca06;
+        border-radius: 80%;
+        z-index: -1;
       }
 
       svg#wheel {
@@ -93,14 +90,14 @@
           transform: translateX(-50%) rotate(90deg);
           width: 6%;
           height: 6%;
-          fill: var(--color-theme);
-          filter: none;
+          fill: #d81b2e;
+          filter: drop-shadow(0 4px 8px rgba(216, 27, 46, 0.4));
           z-index: 5;
       }
 
       .spin-button {
           position: absolute;
-          top: 620px;
+          top: 500px;
           left: 50%;
           transform: translate(-50%, -50%);
           width: 400px;
@@ -123,7 +120,7 @@
           color: #666;
           display: flex;
           align-items: flex-start;
-          padding-top: 90px;
+          padding-top: 70px;
           justify-content: center;
           -webkit-user-select: none; 
           -moz-user-select: none;    
@@ -170,7 +167,7 @@
         top: 220px;
         left: 200px;
         width: 70%;
-        height: 45%;
+        height: 55%;
         display: flex;
         justify-content: center;
         text-items: center;
@@ -219,13 +216,6 @@
     margin-bottom: 1rem;
 }
 
-.popup-prize {
-    color: #2e7d32;
-    font-size: 2.2rem;
-    font-weight: bold;
-    margin: 1rem 0;
-    font-family: var(--font-fun);
-}
 
 .popup-description {
     color: #666;
@@ -238,6 +228,7 @@
     display: flex;
     gap: 1rem;
     justify-content: center;
+    margin-bottom: 50px;
 }
 
 .popup-btn {
@@ -300,6 +291,80 @@
         color: var(--color-theme);
       }
 
+      #confetti-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1500;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+
+      #confetti-canvas.active {
+        opacity: 1;
+      }
+
+      /*user info display */
+      .user-info {
+        position: absolute;
+        top: 175px;
+        left: 13%;
+        transform: translateX(-50%);
+        z-index: 20;
+        background: rgba(251, 252, 248, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 15px 22px;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+        border: 2px solid rgba(234, 59, 82, 0.3);
+        font-family: var(--font-main);
+        text-align: left;
+        min-width: 300px;
+    }
+
+.user-info .welcome-text {
+    color: #ea3b52;
+    margin-left: 10px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.user-info .details-text {
+    color: #1A202C;
+    margin-left: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.user-info .highlight {
+    color: #86BE4E;
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .user-info {
+        top: 100px;
+        padding: 12px 20px;
+        min-width: 280px;
+        max-width: 90%;
+    }
+    
+    .user-info .welcome-text {
+        font-size: 1.1rem;
+    }
+    
+    .user-info .details-text {
+        font-size: 0.9rem;
+    }
+}
+
       /* Responsive design */
       @media (max-width: 768px) {
           .wheel-container {
@@ -319,8 +384,10 @@
 </style>
 </head>
 <body>
-    <!-- Animated background dots -->
-    <div class="bg-dots"></div>
+
+    <!-- confetti -->
+    <canvas id="confetti-canvas"></canvas>
+
     
     <div class="wheel-container">
         <svg id="wheel" viewBox="0 0 100 100">
@@ -338,27 +405,37 @@
         </svg>
     </div>
     
-    <h1 class="main-title">Buy First, Win Now!</h1>
+    <h1 class="main-title">BUY FIRST, WIN NOW!</h1>
+
+    <div class="user-info" id="userInfo">
+    <div class="welcome-text">Welcome, <span id="userName" class="highlight"></span></div>
+    <div class="details-text">
+        Receipt: <span id="userReceipt" class="highlight"></span> | 
+        Branch: <span id="userBranch" class="highlight"></span>
+    </div>
+</div>
 
     <script>
-        // Create animated background dots
-        function createBackgroundDots() {
-            const bgDots = document.querySelector('.bg-dots');
-            for (let i = 0; i < 20; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'bg-dot';
-                dot.style.left = Math.random() * 100 + '%';
-                dot.style.top = Math.random() * 100 + '%';
-                dot.style.animationDelay = Math.random() * 6 + 's';
-                bgDots.appendChild(dot);
+
+        //load user data
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = sessionStorage.getItem('userFormData');
+            if (userData) {
+                const data = JSON.parse(userData);
+                document.getElementById('userName').textContent = data.name;
+                document.getElementById('userReceipt').textContent = data.receiptNo;
+                document.getElementById('userBranch').textContent = data.branch;
+            } else {
+
+                window.location.href = 'landing_page.html';
             }
-        }
-        createBackgroundDots();
+        });
+
 
        document.body.insertAdjacentHTML('beforeend', `
     <div class="popup-overlay" id="prizePopup">
         <div class="popup-content">
-            <div class="popup-header">  congraotulations! </div>
+            <div class="popup-header">  Congratulations! </div>
             <div class="popup-body">
                 <div class="popup-message">You have won:</div>
                 <div class="popup-prize" id="popupPrizeText">Prize 1</div>
@@ -371,15 +448,23 @@
     </div>
 `);
 
+
+
         function showPrizePopup(prize) {
             document.getElementById('popupPrizeText').textContent = prize;
             document.getElementById('prizePopup').classList.add('show');
+             startConfetti();
 
         }
 
 
         function closePrizePopup() {
             document.getElementById('prizePopup').classList.remove('show');
+
+            //redirect to landing page if closed
+            setTimeout(() => {
+                window.location.href = 'landing_page.html';
+            }, 300);
 
         }
 
@@ -420,8 +505,8 @@
         // Hide the background circle
         document.querySelector('svg circle#slice').style.display = 'none';
 
-// Create 8 clean slices
-        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
+        // 8 parts in circle
+        const colors = ['#EA3B52', '#86BE4E', '#FFCA06', '#63CBD8', '#FF4B33', '#63CBD8', '#D81B2E', '#86BE4E'];
 
         for (let i = 0; i < 8; i++) {
             const startAngle = (i * 45 - 22.5) * Math.PI / 180;
@@ -440,9 +525,10 @@
             `;
             containerSlices.innerHTML += path;
 
-            const midAngle = (i * 45) * Math.PI / 180; 
-    const textX = 50 + Math.cos(midAngle) * 28; // Distance from center
-    const textY = 50 + Math.sin(midAngle) * 28;
+            const midAngle = (i * 45) * Math.PI / 180;
+            //distance from center 
+    const textX = 50 + Math.cos(midAngle) * 32; 
+    const textY = 50 + Math.sin(midAngle) * 32;
     
     const textElement = `
         <text x="${textX}" y="${textY}" 
@@ -516,15 +602,59 @@ function spinWheel() {
     pin.style.animation = `pinWheel ${randomDuration / 8}s infinite ease-in-out`;
 
 
-
-            // Update theme color gradually during spin
     let colorStep = 0;
-    const colorInterval = setInterval(() => {
-        const randomColor = `#${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}`;
-        document.documentElement.style.setProperty('--color-theme', randomColor);
-        colorStep++;
-        if (colorStep > 20) clearInterval(colorInterval);
-    }, randomDuration * 1000 / 20);
+    //const colorInterval = setInterval(() => {
+
+        // TRIAL 1
+       // const transformStyle = containerSlices.style.transform;
+       // const rotationMatch = transformStyle.match(/rotate\(([^)]+)deg\)/);
+       // const currentRotation = rotationMatch ? parseFloat(rotationMatch[1] % 360) : 0;
+
+        // TRIAL 2
+        //const computedStyle = window.getComputedStyle(containerSlices);
+        //const matrix = computedStyle.transform;
+
+        //let currentRotation = 0;
+        //if (matrix !== 'none') {
+        //    const matrixValues = matrix.match(/matrix.*\((.+)/)[1].split(', ');
+        //    const a = parseFloat(matrixValues[0]);
+        //    const b = parseFloat(matrixValues[1]);
+        //    currentRotation = Math.atan2(b, a) * (180 / Math.PI);
+        //}
+
+        const animationStartTime = Date.now();
+        const startRotation = 0;
+        const endRotation = 3600 - targetRotation;
+
+        const colorInterval = setInterval(() => {
+            const elapsed = Date.now() - animationStartTime;
+            const progress = Math.min(elapsed / (randomDuration * 1000), 1);
+            
+            const easedProgress = progress < 0.5 
+                ? 2 * progress * progress 
+                : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+            
+            const currentRotation = startRotation + (endRotation - startRotation) * easedProgress;
+            
+            const normalizedRotation = (360 - (currentRotation % 360) + 22.5) % 360;
+            //const sliceIndex = Math.floor(normalizedRotation / 45) % 8;
+            const sliceIndex = (Math.floor(normalizedRotation / 45) + 6) % 8;
+            console.log('visual check - rotation:', currentRotation.toFixed(1), 'normalized:', normalizedRotation.toFixed(1), 'slice index:', sliceIndex, 'expected colour:', colors[sliceIndex]);
+
+            // Debug: Check what's actually at the pin position
+            if (Math.abs(currentRotation % 360) < 5) { // When rotation is near 0
+                console.log('WHEEL AT START POSITION - Pin should point to slice 0, color should be:', colors[0]);
+            }
+            const sliceColor = colors[sliceIndex];
+            
+            console.log('Progress:', (progress * 100).toFixed(1) + '%', 'Rotation:', currentRotation.toFixed(1), 'Slice:', sliceIndex, 'Color:', sliceColor);
+            
+            document.documentElement.style.setProperty('--color-theme', sliceColor);
+            
+            if (progress >= 1) {
+                clearInterval(colorInterval);
+            }
+        }, 50);
 
 
 
@@ -541,7 +671,7 @@ setTimeout(() => {
         const y = parseFloat(textEl.getAttribute('y'));
         textEl.setAttribute('transform', `rotate(${-currentRotation}, ${x}, ${y})`);
     });
-}, randomDuration * 1000 * 0.5);
+}, randomDuration * 1000 * 0.3); //adjust the randomisation
 
 timeoutID = setTimeout(() => {
     pin.style.animation = '';
@@ -602,9 +732,114 @@ document.addEventListener('keydown', (e) => {
         spinWheel();
     }
 });
+
+
+// confetti system
+const NUM_CONFETTI = 350;
+const COLORS = [[234, 59, 82], [134, 190, 78], [255, 202, 6], [99, 203, 216], [255, 75, 51]];
+const PI_2 = 2 * Math.PI;
+let confettiCanvas = document.getElementById('confetti-canvas');
+let confettiContext = confettiCanvas.getContext('2d');
+let confettiW = 0, confettiH = 0;
+let confettiArray = [];
+let confettiAnimationId = null;
+
+function resizeConfettiCanvas() {
+    confettiW = confettiCanvas.width = window.innerWidth;
+    confettiH = confettiCanvas.height = window.innerHeight;
+}
+
+window.addEventListener('resize', resizeConfettiCanvas, false);
+resizeConfettiCanvas();
+
+function range(a, b) {
+    return (b - a) * Math.random() + a;
+}
+
+function drawCircle(x, y, r, style) {
+    confettiContext.beginPath();
+    confettiContext.arc(x, y, r, 0, PI_2, false);
+    confettiContext.fillStyle = style;
+    confettiContext.fill();
+}
+
+class Confetti {
+    constructor() {
+        this.style = COLORS[Math.floor(range(0, 5))];
+        this.rgb = `rgba(${this.style[0]},${this.style[1]},${this.style[2]}`;
+        this.r = Math.floor(range(2, 6));
+        this.r2 = 2 * this.r;
+        this.replace();
+    }
+
+    replace() {
+        this.opacity = 0;
+        this.dop = 0.03 * range(1, 4);
+        this.x = range(-this.r2, confettiW - this.r2);
+        this.y = range(-20, confettiH - this.r2);
+        this.xmax = confettiW - this.r;
+        this.ymax = confettiH - this.r;
+        this.vx = range(0, 2) + 8 * 0.5 - 5; 
+        this.vy = 0.7 * this.r + range(-1, 1);
+    }
+
+    draw() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.opacity += this.dop;
+        
+        if (this.opacity > 1) {
+            this.opacity = 1;
+            this.dop *= -1;
+        }
+        
+        if (this.opacity < 0 || this.y > this.ymax) {
+            this.replace();
+        }
+        
+        if (!(0 < this.x && this.x < this.xmax)) {
+            this.x = (this.x + this.xmax) % this.xmax;
+        }
+        
+        drawCircle(Math.floor(this.x), Math.floor(this.y), this.r, `${this.rgb},${this.opacity})`);
+    }
+}
+
+function initConfetti() {
+    confettiArray = [];
+    for (let i = 0; i < NUM_CONFETTI; i++) {
+        confettiArray.push(new Confetti());
+    }
+}
+
+function animateConfetti() {
+    confettiAnimationId = requestAnimationFrame(animateConfetti);
+    confettiContext.clearRect(0, 0, confettiW, confettiH);
+    
+    for (let confetti of confettiArray) {
+        confetti.draw();
+    }
+}
+
+function startConfetti() {
+    confettiCanvas.classList.add('active');
+    initConfetti();
+    animateConfetti();
+    
+    setTimeout(() => {
+        stopConfetti();
+    }, 5000);
+}
+
+function stopConfetti() {
+    confettiCanvas.classList.remove('active');
+    if (confettiAnimationId) {
+        cancelAnimationFrame(confettiAnimationId);
+        confettiAnimationId = null;
+    }
+    confettiContext.clearRect(0, 0, confettiW, confettiH);
+}
+
 </script>
 </body>
 </html>
-
- 
-
