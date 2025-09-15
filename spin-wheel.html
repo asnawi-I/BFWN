@@ -526,13 +526,13 @@
                 const prize = branch.prizes.find(p => p.id === prizeId);
                 if (!prize || prize.quantity <= 0) return false; 
 
-                //decrease
+                // Decrease quantity
                 prize.quantity--;
                 if (prize.quantity === 0) {
                     prize.available = false;
                 }
 
-                //record winner
+                // Record winner
                 this.winners.push({
                     customerName: customerName,
                     prize: prize.name,
@@ -541,7 +541,9 @@
                     branchId: branchKey,
                     timestamp: new Date().toISOString()
                 });
-
+                
+                currentBranchPrizes = this.getAvailablePrizes(branchKey);
+                
                 return true;
             }
         };
@@ -571,6 +573,10 @@
                 window.location.href = 'landing_page.html';
             }
         });
+
+        setInterval(() => {
+            updateInventoryDisplay();
+        }, 5000);
 
 
        document.body.insertAdjacentHTML('beforeend', `
@@ -711,6 +717,10 @@ function stopPrizeAnimation() {
 function spinWheel() {
     if (isSpinning) return;
 
+    if (!updateInventoryDisplay()) {
+        alert('All prizes have been claimed! Thank you for playing!');
+        return;
+    }
 
     isSpinning = true;
 
@@ -879,6 +889,40 @@ document.addEventListener('keydown', (e) => {
         spinWheel();
     }
 });
+
+
+//show current inventory status
+function updateInventoryDisplay() {
+    const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
+    
+    // Count prizes by category
+    const inventory = {
+        gold: availablePrizes.filter(p => p.category === 'gold').reduce((sum, p) => sum + p.quantity, 0),
+        silver: availablePrizes.filter(p => p.category === 'silver').reduce((sum, p) => sum + p.quantity, 0),
+        complimentary: availablePrizes.filter(p => p.category === 'complimentary').reduce((sum, p) => sum + p.quantity, 0)
+    };
+    
+    console.log('Current Inventory:', inventory);
+    
+    // If all prizes are gone, disable spinning
+    if (availablePrizes.length === 0) {
+        spinButton.disabled = true;
+        spinButton.textContent = 'NO PRIZES LEFT';
+        spinButton.style.background = '#gray';
+        return false;
+    }
+    
+    return true;
+}
+
+function showRecentWinners() {
+    const recentWinners = PRIZE_DATABASE.winners
+        .filter(w => w.branchId === currentBranchKey)
+        .slice(-5); // Last 5 winners
+    
+    console.log('Recent winners:', recentWinners);
+    return recentWinners;
+}
 
 
 // confetti system
