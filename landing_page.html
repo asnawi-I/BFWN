@@ -12,8 +12,8 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #EA3B52 0%, #FBFCF8 50%, #86BE4E 100%);
+            font-family: "Poppins", sans-serif;
+            background-image: url('Background.png');
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -33,12 +33,13 @@
         }
 
         .title {
-            color: #FBCF8;
-            font-size: 2.5rem;
+            color: #ea3b52;
+            font-size: 2.0rem;
             text-align: center;
             margin-bottom: 40px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            font-weight: bold;
+            text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
+            font-weight: bolder;
+            letter-spacing: 1px;
         }
 
         .form-group {
@@ -91,8 +92,8 @@
         .spin-button {
             width: 100%;
             padding: 15px 30px;
-            background: linear-gradient(45deg, #86BE4E);
-            color: #FBCF8;
+            background: #86BE4E;
+            color: #FBfCF8;
             font-size: 1.3rem;
             font-weight: bold;
             border: none;
@@ -102,12 +103,12 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(216, 27, 46, 0.4);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         .spin-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(216, 27, 46, 0.6);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
         }
 
         .spin-button:active {
@@ -128,7 +129,28 @@
             display: none;
         }
 
-        
+
+        .clear-btn {
+            width: 100%;
+            padding: 15px 30px;
+            background: #EA3B52;
+            color: #FBfCF8;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .clear-btn:hover {
+            transform: translateY(-2px);
+            box-shadow:0 6px 12px rgba(0, 0, 0, 0.4) ;
+        }
+
 
         @media (max-width: 600px) {
             .container {
@@ -143,7 +165,7 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="title">Buy First, Win Now!</h1>
+        <h1 class="title">BUY FIRST, WIN NOW!</h1>
         
         <form id="spinForm">
             <div class="form-group">
@@ -172,10 +194,45 @@
             <button type="button" id="readyToSpin" class="spin-button">
                 Ready to Spin
             </button>
+            <button type="button" id="clearForm" class="clear-btn">CLEAR</button>
         </form>
     </div>
 
     <script>
+
+        //load saved data
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedData = sessionStorage.getItem('userFormData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                document.getElementById('txtboxName').value = data.name || '';
+                document.getElementById('txtReceiptNo').value = data.receiptNo || '';
+                document.getElementById('branchSelect').value = data.branch || '';
+            }
+        });
+
+        // clear function
+        document.getElementById('clearForm').addEventListener('click', function() {
+
+            //clear
+            document.getElementById('txtboxName').value = '';
+            document.getElementById('txtReceiptNo').value = '';
+            document.getElementById('branchSelect').value = '';
+        
+            sessionStorage.removeItem('userFormData');
+
+            //reset 
+            document.getElementById('txtboxName').style.borderColor = '#86ne4e';
+            document.getElementById('txtReceiptNo').style.borderColor = '#86ne4e';
+            document.getElementById('branchSelect').style.borderColor = '#86ne4e';
+
+            //hide error
+            document.getElementById('nameError').style.display = 'none';
+            document.getElementById('receiptError').style.display = 'none';
+            document.getElementById('branchError').style.display = 'none';
+
+        })
+
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('spinForm');
             const nameInput = document.getElementById('txtboxName');

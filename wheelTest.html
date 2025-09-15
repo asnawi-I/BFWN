@@ -318,11 +318,12 @@
         backdrop-filter: blur(10px);
         border-radius: 15px;
         padding: 15px 22px;
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         border: 2px solid rgba(234, 59, 82, 0.3);
         font-family: var(--font-main);
         text-align: left;
         min-width: 300px;
+        
     }
 
 .user-info .welcome-text {
@@ -348,20 +349,55 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-    .user-info {
-        top: 100px;
-        padding: 12px 20px;
-        min-width: 280px;
-        max-width: 90%;
+
+/* Media query for 24-inch */
+@media screen and (max-width: 1920px) and (min-width: 1200px) {
+    h1.main-title {
+        font-size: 140px;
+        margin-top: -20px;
+        top: 1.5rem;
     }
-    
+
+    .wheel-container {
+        width: 175vmin;
+        height: 175vmin;
+        bottom: -100%;
+        left: 50%;
+    }
+
+    .spin-button {
+        font-size: 100px;
+        padding-top: 90px;
+        top: 770px;
+        width: 500px;
+        height: 500px;
+    }
+
+    .user-info {
+        top: 230px;
+        left: 9%;
+        min-width: 300px;
+        min-height: 90px;
+        padding: 25px 32px;
+    }
+
     .user-info .welcome-text {
+        font-size: 1.4rem;
+    }
+
+    .user-info .details-text {
         font-size: 1.1rem;
     }
-    
-    .user-info .details-text {
-        font-size: 0.9rem;
+
+
+
+    svg#pin {
+        width: 6%;
+        height: 6%;
+    }
+
+    .prize-text {
+        font-size: 2.4 !important;
     }
 }
 
