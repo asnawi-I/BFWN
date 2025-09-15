@@ -453,6 +453,104 @@
 
     <script>
 
+        // prize database
+        const PRIZE_DATABASE = {
+            branches: {
+                'batu-satu': {
+                    id: 1,
+                    name: 'Batu Satu Branch',
+                    prizes: [
+                        // Gold Prizes
+                        { id: 'B2', name: 'Gold Prize B2', category: 'gold', quantity: 1, probability: 5, available: true },
+                        { id: 'B3', name: 'Gold Prize B3', category: 'gold', quantity: 1, probability: 5, available: true },
+                        
+                        // Silver Prizes 
+                        { id: 'B1', name: 'Silver Prize B1', category: 'silver', quantity: 1, probability: 15, available: true },
+                        { id: 'B4', name: 'Silver Prize B4', category: 'silver', quantity: 1, probability: 15, available: true },
+                        
+                        // Complimentary Gifts
+                        { id: 'COMP1', name: 'Complimentary Gift 1', category: 'complimentary', quantity: 50, probability: 25, available: true },
+                        { id: 'COMP2', name: 'Complimentary Gift 2', category: 'complimentary', quantity: 50, probability: 30, available: true }
+
+                    ]
+                },
+
+                'madang': {
+                    id: 2,
+                    name: 'Madang Branch',
+                    prizes: [
+                        // Gold Prizes
+                        { id: 'M2', name: 'Gold Prize M1', category: 'gold', quantity: 1, probability: 5, available: true },
+                        { id: 'M3', name: 'Gold Prize M4', category: 'gold', quantity: 1, probability: 5, available: true },
+                        
+                        // Silver Prizes 
+                        { id: 'M1', name: 'Silver Prize M2', category: 'silver', quantity: 1, probability: 15, available: true },
+                        { id: 'M4', name: 'Silver Prize M3', category: 'silver', quantity: 1, probability: 15, available: true },
+                        
+                        // Complimentary Gifts
+                        { id: 'COMP3', name: 'Complimentary Gift 3', category: 'complimentary', quantity: 50, probability: 25, available: true },
+                        { id: 'COMP4', name: 'Complimentary Gift 4', category: 'complimentary', quantity: 50, probability: 30, available: true }
+
+                    ]
+                }
+            },
+
+            //track winner
+            winners: [],
+
+            //get available prizes for a branch
+            getAvailablePrizes: function(branchKey) {
+                if (!this.branches[branchKey]) return[];
+                return this.branches[branchKey].prizes.filter(prize => prize.quantity > 0 && prize.available);
+            },
+
+            //weighted prize pool
+            createWeightedPool: function(branchKey) {
+                const availablePrizes = this.getAvailablePrizes(branchKey);
+                let weightedPool = [];
+
+                availablePrizes.forEach(prize => {
+                    for (let i = 0; i < prize.probability; i++){
+                        weightedPool.push(prize);
+                    }
+                });
+
+                return weightedPool;
+            },
+
+            //prize quantity management
+            winPrize: function(prizeId, branchKey, customerName) {
+                const branch = this.branches[branchKey];
+                if (!branch) return false;
+
+                const prize = branch.prizes.find(p => p.id === prizeId);
+                if (!prize || prize.quantity <= 0) return false; 
+
+                //decrease
+                prize.quantity--;
+                if (prize.quantity === 0) {
+                    prize.available = false;
+                }
+
+                //record winner
+                this.winners.push({
+                    customerName: customerName,
+                    prize: prize.name,
+                    prizeId: prizeId,
+                    branch: branch.name,
+                    branchId: branchKey,
+                    timestamp: new Date().toISOString()
+                });
+
+                return true;
+            }
+        };
+
+
+        // store current branch data
+        let currentBranchPrizes = [];
+        let currentBranchKey = '';
+
         //load user data
         document.addEventListener('DOMContentLoaded', function() {
             const userData = sessionStorage.getItem('userFormData');
@@ -461,8 +559,15 @@
                 document.getElementById('userName').textContent = data.name;
                 document.getElementById('userReceipt').textContent = data.receiptNo;
                 document.getElementById('userBranch').textContent = data.branch;
-            } else {
 
+
+                currentBranchKey = data.branch;
+                currentBranchPrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
+
+                generateWheelFromPrizes();
+
+                console.log('Loaded prizes for', currentBranchKey, ':', currentBranchPrizes);
+            } else {
                 window.location.href = 'landing_page.html';
             }
         });
@@ -515,79 +620,83 @@
         const randomInt = (min = 0, max = 16) => Math.floor(Math.random() * (max - min) + min);
         const randomHex = () => randomInt().toString(16);
 
-        const suspicious = [
-            { rotation: 0, color: 'A2CCB6', name: 'Prize 1' },
-            { rotation: 45, color: 'FF6B6B', name: 'Prize 2' },
-            { rotation: 90, color: '4ECDC4', name: 'Prize 3' },
-            { rotation: 135, color: 'FCEEB5', name: 'Prize 4' },
-            { rotation: 180, color: '95E1D3', name: 'Prize 5' },
-            { rotation: 225, color: 'F38BA8', name: 'Prize 6' },
-            { rotation: 270, color: 'EE786E', name: 'Prize 7' },
-            { rotation: 315, color: 'A8E6CF', name: 'Prize 8' }
-        ];
-
-        const allPrizes = [];
-        for (let i = 1; i <= 100; i++){
-            allPrizes.push(`Prize ${i}`);
-        }
-        allPrizes.push("JACKPOT", "BONUS", "MEGA PRIZE", "SUPER PRIZE", "LUCKY WIN");
 
 
-        // Set random background color
-        let randomFill = '';
-        for (let i = 0; i < 6; i += 1) {
-            randomFill += randomHex();
-        }
-        // Hide the background circle
-        document.querySelector('svg circle#slice').style.display = 'none';
 
-        // 8 parts in circle
-        const colors = ['#EA3B52', '#86BE4E', '#FFCA06', '#63CBD8', '#FF4B33', '#63CBD8', '#D81B2E', '#86BE4E'];
+        function generateWheelFromPrizes() {
 
-        for (let i = 0; i < 8; i++) {
-            const startAngle = (i * 45 - 22.5) * Math.PI / 180;
-            const endAngle = ((i + 1) * 45 - 22.5) * Math.PI / 180;
+            containerSlices.innerHTML = '';
 
-            const x1 = 50 + Math.cos(startAngle) * 46;
-            const y1 = 50 + Math.sin(startAngle) * 46;
-            const x2 = 50 + Math.cos(endAngle) * 46;
-            const y2 = 50 + Math.sin(endAngle) * 46;
+             document.querySelector('svg circle#slice').style.display = 'none';
+            
+            const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
+            if (availablePrizes.length === 0) {
+                alert('All prizes have been claimed!');
+                return;
+            }
+            
+            //  8 display segments with category representation
+            const displaySegments = [
+                { category: 'gold', color: '#EA3B52', text: 'GOLD PRIZE' },
+                { category: 'complimentary', color: '#86BE4E', text: 'GIFT' },
+                { category: 'silver', color: '#FFCA06', text: 'SILVER PRIZE' },
+                { category: 'complimentary', color: '#63CBD8', text: 'GIFT' },
+                { category: 'gold', color: '#FF4B33', text: 'GOLD PRIZE' },
+                { category: 'complimentary', color: '#63CBD8', text: 'GIFT' },
+                { category: 'silver', color: '#D81B2E', text: 'SILVER PRIZE' },
+                { category: 'complimentary', color: '#86BE4E', text: 'GIFT' }
+            ];
+            
+            // Generate wheel segments
+            for (let i = 0; i < 8; i++) {
+                const startAngle = (i * 45 - 22.5) * Math.PI / 180;
+                const endAngle = ((i + 1) * 45 - 22.5) * Math.PI / 180;
 
-            const path = `
-        <path d="M 50 50 L ${x1} ${y1} A 46 46 0 0 1 ${x2} ${y2} Z" 
-              fill="${colors[i]}" 
-              stroke="white" 
-              stroke-width="0.5"/>
-            `;
-            containerSlices.innerHTML += path;
+                const x1 = 50 + Math.cos(startAngle) * 46;
+                const y1 = 50 + Math.sin(startAngle) * 46;
+                const x2 = 50 + Math.cos(endAngle) * 46;
+                const y2 = 50 + Math.sin(endAngle) * 46;
 
-            const midAngle = (i * 45) * Math.PI / 180;
-            //distance from center 
-    const textX = 50 + Math.cos(midAngle) * 32; 
-    const textY = 50 + Math.sin(midAngle) * 32;
-    
-    const textElement = `
-        <text x="${textX}" y="${textY}" 
-              text-anchor="middle" 
-              dominant-baseline="middle"
-              fill="white" 
-              font-size="2.8" 
-              font-weight="bold"
-              font-family="Poppins"
-              stroke="#000"
-              stroke-width="0.1"
-              class="prize-text">Prize  ${Math.floor(Math.random() * 100) + 1}</text>
-    `;
-    containerSlices.innerHTML += textElement;
+                const segment = displaySegments[i];
+
+                const path = `
+                    <path d="M 50 50 L ${x1} ${y1} A 46 46 0 0 1 ${x2} ${y2} Z" 
+                          fill="${segment.color}" 
+                          stroke="white" 
+                          stroke-width="0.5"/>
+                `;
+                containerSlices.innerHTML += path;
+
+                const midAngle = (i * 45) * Math.PI / 180;
+                const textX = 50 + Math.cos(midAngle) * 32; 
+                const textY = 50 + Math.sin(midAngle) * 32;
+                
+                const textElement = `
+                    <text x="${textX}" y="${textY}" 
+                          text-anchor="middle" 
+                          dominant-baseline="middle"
+                          fill="white" 
+                          font-size="2.2" 
+                          font-weight="bold"
+                          font-family="Poppins"
+                          stroke="#000"
+                          stroke-width="0.1"
+                          class="prize-text">${segment.text}</text>
+                `;
+                containerSlices.innerHTML += textElement;
+            }
 }
 
 let textUpdateInterval;
 
 function startPrizeAnimation() {
+    const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
+    const allPrizeNames = availablePrizes.map(prize => prize.name);
+    
     textUpdateInterval = setInterval(() => {
         const textElements = containerSlices.querySelectorAll('.prize-text');
         textElements.forEach(textEl => {
-            const randomPrize = allPrizes[Math.floor(Math.random() * allPrizes.length)];
+            const randomPrize = allPrizeNames[Math.floor(Math.random() * allPrizeNames.length)];
             textEl.textContent = randomPrize;
         });
     }, 50);
@@ -712,49 +821,51 @@ setTimeout(() => {
 timeoutID = setTimeout(() => {
     pin.style.animation = '';
 
-    // Detect winner
-    const textElements = containerSlices.querySelectorAll('.prize-text');
-    let closestElement = null;
-    let minDistance = Infinity;
-    const pinX = 50; 
-    const pinY = 22; 
+    const userData = JSON.parse(sessionStorage.getItem('userFormData'));
+    const customerName = userData.name;
+    
 
-    textElements.forEach((textEl) => {
-        const x = parseFloat(textEl.getAttribute('x'));
-        const y = parseFloat(textEl.getAttribute('y'));
-       
-        const transformStyle = containerSlices.style.transform;
-        const rotationMatch = transformStyle.match(/rotate\(([^)]+)deg\)/);
-        const currentRotation = rotationMatch ? parseFloat(rotationMatch[1] % 360) : 0;
-        
-        const rotationRad = (currentRotation * Math.PI) / 180;
-        const centerX = 50, centerY = 50;
-        
-        const rotatedX = centerX + (x - centerX) * Math.cos(rotationRad) - (y - centerY) * Math.sin(rotationRad);
-        const rotatedY = centerY + (x - centerX) * Math.sin(rotationRad) + (y - centerY) * Math.cos(rotationRad);
-        
-        const distance = Math.sqrt((rotatedX - pinX) ** 2 + (rotatedY - pinY) ** 2);
-        
-        if (distance < minDistance) {
-            minDistance = distance;
-            closestElement = textEl;
-        }
-    });
+    const weightedPool = PRIZE_DATABASE.createWeightedPool(currentBranchKey);
     
-    const finalPrize = closestElement ? closestElement.textContent : `Prize ${randomInt(1, 101)}`;
+    if (weightedPool.length === 0) {
+        alert('All prizes have been claimed!');
+        [spinButton, pin].forEach(el => {
+            el.classList.remove('isSpinning');
+            el.addEventListener('click', spinWheel);
+        });
+        isSpinning = false;
+        return;
+    }
     
-    setTimeout(() => {
-        showPrizePopup(finalPrize);
-    }, 1000);
+
+    const randomIndex = Math.floor(Math.random() * weightedPool.length);
+    const selectedPrize = weightedPool[randomIndex];
+    
+    // Update inventory
+    const success = PRIZE_DATABASE.winPrize(selectedPrize.id, currentBranchKey, customerName);
+    
+    if (success) {
+        // Update all text elements to show the won prize
+        const textElements = containerSlices.querySelectorAll('.prize-text');
+        textElements.forEach((textEl) => {
+            textEl.textContent = selectedPrize.name;
+        });
+        
+        setTimeout(() => {
+            showPrizePopup(selectedPrize.name);
+        }, 1000);
+    } else {
+        alert('Prize selection failed. Please try again.');
+    }
 
     [spinButton, pin].forEach(el => {
         el.classList.remove('isSpinning');
         el.addEventListener('click', spinWheel);
     });
 
-    isSpinning = false;
-    clearTimeout(timeoutID);
-}, randomDuration * 1000);
+        isSpinning = false;
+        clearTimeout(timeoutID);
+    }, randomDuration * 1000);
 }
 
 [spinButton, pin].forEach(el => {
