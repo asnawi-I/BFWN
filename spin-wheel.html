@@ -164,7 +164,7 @@
       /*popup modal*/
       .popup-overlay {
         position: fixed;
-        top: 220px;
+        top: 200px;
         left: 200px;
         width: 70%;
         height: 55%;
@@ -350,7 +350,7 @@
 
 /* Responsive adjustments */
 
-/* Media query for 24-inch */
+/* Media query for 24-inch 
 @media screen and (max-width: 1920px) and (min-width: 1200px) {
     h1.main-title {
         font-size: 140px;
@@ -400,6 +400,8 @@
         font-size: 2.4 !important;
     }
 }
+
+*/
 
       /* Responsive design */
       @media (max-width: 768px) {
@@ -519,7 +521,7 @@
             },
 
             //prize quantity management
-            winPrize: function(prizeId, branchKey, customerName) {
+            winPrize: function(prizeId, branchKey, customerName, receiptNo) {
                 const branch = this.branches[branchKey];
                 if (!branch) return false;
 
@@ -539,14 +541,25 @@
                     prizeId: prizeId,
                     branch: branch.name,
                     branchId: branchKey,
+                    receiptNo: receiptNo,
                     timestamp: new Date().toISOString()
                 });
                 
                 currentBranchPrizes = this.getAvailablePrizes(branchKey);
-                
                 return true;
             }
         };
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('PRIZE_DATABASE');
+            if (saved) {
+                const savedData = JSON.parse(saved);
+                Object.assign(PRIZE_DATABASE, savedData);
+                console.log('spin wheel loaded exist winners:', PRIZE_DATABASE.winners);
+            }
+        }
+
+        loadFromLocalStorage();
 
 
         // store current branch data
@@ -564,6 +577,8 @@
 
 
                 currentBranchKey = data.branch;
+                console.log('LOADED BRANCH:', currentBranchKey);
+                console.log('USER DATA:', data);
                 currentBranchPrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
 
                 generateWheelFromPrizes();
@@ -780,6 +795,7 @@ function spinWheel() {
         const animationStartTime = Date.now();
         const startRotation = 0;
         const endRotation = 3600 - targetRotation;
+        const colors = ['#EA3B52', '#86BE4E', '#FFCA06', '#63CBD8', '#FF4B33', '#63CBD8', '#D81B2E', '#86BE4E'];
 
         const colorInterval = setInterval(() => {
             const elapsed = Date.now() - animationStartTime;
@@ -852,9 +868,15 @@ timeoutID = setTimeout(() => {
     const selectedPrize = weightedPool[randomIndex];
     
     // Update inventory
-    const success = PRIZE_DATABASE.winPrize(selectedPrize.id, currentBranchKey, customerName);
+    const success = PRIZE_DATABASE.winPrize(selectedPrize.id, currentBranchKey, customerName, userData.receiptNo);
     
     if (success) {
+         console.log('WINNER ADDED:', PRIZE_DATABASE.winners);
+         console.log('CURRENT BRANCH:', currentBranchKey); 
+
+        saveToLocalStorage();
+        backupToConsole();
+
         // Update all text elements to show the won prize
         const textElements = containerSlices.querySelectorAll('.prize-text');
         textElements.forEach((textEl) => {
@@ -890,6 +912,22 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+
+//save to local storage after winninng
+function saveToLocalStorage() {
+    localStorage.setItem('PRIZE_DATABASE', JSON.stringify(PRIZE_DATABASE));
+    console.log('SAVED TO LOCALSTORAGE:', PRIZE_DATABASE.winners);
+    
+    // Trigger storage event for other tabs/windows
+    window.dispatchEvent(new StorageEvent('storage', {
+        key: 'PRIZE_DATABASE',
+        newValue: JSON.stringify(PRIZE_DATABASE)
+    }));
+}
+
+function backupToConsole() {
+    console.log('CURRENT DATABASE BACKUP:', JSON.stringify(PRIZE_DATABASE, null, 2));
+}
 
 //show current inventory status
 function updateInventoryDisplay() {

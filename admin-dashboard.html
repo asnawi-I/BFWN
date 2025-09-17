@@ -160,8 +160,8 @@
     <h2>Admin Panel</h2>
     <a href="#" class="active" onclick="showSection('dashboard')">Dashboard</a>
     <a href="#" onclick="showSection('prizes')">Manage Prizes</a>
-    <a href="#" onclick="showSection('wheel-settings')">Wheel Settings</a>
-    <a href="#" onclick="showSection('spin-logs')">Spin Logs</a>
+    <a href="#" onclick="showSection('wheelSettings')">Wheel Settings</a>
+    <a href="#" onclick="showSection('spinLogs')">Spin Logs</a>
     <a href="#" onclick="showSection('analytics')">Analytics</a>
   </div>
   
@@ -209,9 +209,29 @@
     
     <!-- Spin Logs Section -->
     <div id="spinLogsSection" class="section">
-      <h2>Spin History</h2>
-      <p>View all spin results and winner history.</p>
-      <!-- Will implement spin logs here -->
+      <h2>Winner History</h2>
+      
+      <div style="margin-bottom: 20px;">
+        <button class="btn btn-primary" onclick="refreshLogs()">Refresh</button>
+        <button class="btn btn-warning" onclick="exportLogs()">Export CSV</button>
+        <button class="btn btn-danger" onclick="clearLogs()">Clear All</button>
+      </div>
+      
+      <table id="winnersTable">
+        <thead>
+          <tr>
+            <th>Date/Time</th>
+            <th>Customer Name</th>
+            <th>Prize Won</th>
+            <th>Category</th>
+            <th>Receipt No.</th>
+            <th>Branch</th>
+          </tr>
+        </thead>
+        <tbody id="winnersTableBody">
+          <!-- Dynamic content -->
+        </tbody>
+      </table>
     </div>
     
     <!-- Analytics Section -->
@@ -260,7 +280,45 @@
   </div>
 
 <script>
-// Import the same PRIZE_DATABASE structure from your spin wheel
+
+  // Load from localStorage on page load
+function loadFromLocalStorage() {
+    const saved = localStorage.getItem('PRIZE_DATABASE');
+    if (saved) {
+        console.log('LOADING FROM LOCALSTORAGE:', saved);
+        const savedData = JSON.parse(saved);
+        
+        Object.assign(PRIZE_DATABASE, savedData);
+        console.log('LOADED WINNERS:', PRIZE_DATABASE.winners);
+    }
+}
+
+window.addEventListener('storage', function(e) {
+    if (e.key === 'PRIZE_DATABASE') {
+        console.log('Storage updated, refreshing data...');
+        loadFromLocalStorage();
+        
+        // Auto-refresh current section if it's spin logs
+        const activeSection = document.querySelector('.section.active');
+        if (activeSection && activeSection.id === 'spinLogsSection') {
+            loadWinnerHistory();
+        }
+    }
+});
+
+setInterval(() => {
+    const activeSection = document.querySelector('.section.active');
+    if (activeSection && activeSection.id === 'spinLogsSection') {
+        loadFromLocalStorage();
+        loadWinnerHistory();
+    }
+}, 10000);
+
+// Call this when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadFromLocalStorage();
+});
+
 const PRIZE_DATABASE = {
     branches: {
         'batu-satu': {
@@ -367,12 +425,24 @@ function showSection(sectionName) {
     // Load section-specific data
     if (sectionName === 'prizes') {
         loadPrizesTable();
-    }
+    } else if (sectionName === 'spin-logs') {
+        loadWinnerHistory();
+  }
 }
 
 function switchBranch() {
     currentBranch = document.getElementById('branchSelector').value;
-    loadPrizesTable(); // Reload table for new branch
+    
+    // Reload current section data
+    const activeSection = document.querySelector('.section.active');
+    if (activeSection) {
+        const sectionName = activeSection.id.replace('Section', '');
+        if (sectionName === 'prizes') {
+            loadPrizesTable();
+        } else if (sectionName === 'spinLogs') {
+            loadWinnerHistory();
+        }
+    }
 }
 
 function loadPrizesTable() {
@@ -467,6 +537,83 @@ function closeModal() {
     document.getElementById('prizeModal').style.display = 'none';
 }
 
+function loadWinnerHistory() {
+    const winners = PRIZE_DATABASE.winners.filter(w => w.branchId === currentBranch);
+    const tableBody = document.getElementById('winnersTableBody');
+    
+    if (winners.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No winners yet</td></tr>';
+        return;
+    }
+    
+    tableBody.innerHTML = winners.reverse().map(winner => {
+        const date = new Date(winner.timestamp).toLocaleString();
+        const categoryClass = `category-${getCategoryFromPrize(winner.prize)}`;
+        
+        return `
+            <tr>
+                <td>${date}</td>
+                <td>${winner.customerName}</td>
+                <td>${winner.prize}</td>
+                <td><span class="${categoryClass}">${getCategoryFromPrize(winner.prize).toUpperCase()}</span></td>
+                <td>${winner.receiptNo || 'N/A'}</td>
+                <td>${winner.branch}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function getCategoryFromPrize(prizeName) {
+    // Find category based on prize name
+    for (let branch in PRIZE_DATABASE.branches) {
+        const prize = PRIZE_DATABASE.branches[branch].prizes.find(p => p.name === prizeName);
+        if (prize) return prize.category;
+    }
+    return 'complimentary'; // default
+}
+
+function refreshLogs() {
+    loadWinnerHistory();
+    alert('Winner history refreshed!');
+}
+
+function exportLogs() {
+    const winners = PRIZE_DATABASE.winners.filter(w => w.branchId === currentBranch);
+    
+    if (winners.length === 0) {
+        alert('No data to export');
+        return;
+    }
+    
+    const csvContent = [
+        ['Date/Time', 'Customer Name', 'Prize Won', 'Category', 'Receipt No.', 'Branch'],
+        ...winners.map(w => [
+            new Date(w.timestamp).toLocaleString(),
+            w.customerName,
+            w.prize,
+            getCategoryFromPrize(w.prize),
+            w.receiptNo || 'N/A',
+            w.branch
+        ])
+    ].map(row => row.join(',')).join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `winners_${currentBranch}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+function clearLogs() {
+    if (confirm('Are you sure you want to clear all winner history? This cannot be undone.')) {
+        PRIZE_DATABASE.winners = PRIZE_DATABASE.winners.filter(w => w.branchId !== currentBranch);
+        loadWinnerHistory();
+        alert('Winner history cleared!');
+    }
+}
+
 // Form submission
 document.getElementById('prizeForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -525,7 +672,8 @@ window.onclick = function(event) {
     if (event.target === modal) {
         closeModal();
     }
-}
+  }
+
 </script>
 </body>
 </html>
