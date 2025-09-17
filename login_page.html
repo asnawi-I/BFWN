@@ -199,7 +199,9 @@
       const warningEl   = document.getElementById('warning');
       const submitBtn   = document.getElementById('confirmBtn');
 
-      const VALID_CRED = { user: 'fesadmin', pass: 'bfwn828' };
+      // Define credentials for different roles
+      const ADMIN_CRED = { user: 'bfwnadmin', pass: '@bfwn828' };
+      const USER_CRED  = { user: 'fesadmin', pass: 'bfwn828' };
 
       // Enable button when both fields are non-empty
       function updateButtonState() {
@@ -228,15 +230,27 @@
       // Handle form submit
       form.addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        const username = usernameEl.value;
+        const password = passwordEl.value;
+        
+        console.log('Attempting login...');
+        console.log('Entered Username:', username);
+        console.log('Entered Password:', password);
 
-        const isValid = 
-          usernameEl.value === VALID_CRED.user &&
-          passwordEl.value === VALID_CRED.pass;
-
-        if (isValid) {
-          // In real apps, send credentials to server via AJAX
+        // Check for Admin credentials first
+        if (username === ADMIN_CRED.user && password === ADMIN_CRED.pass) {
+          console.log('Admin login successful. Redirecting to admin-dashboard.html');
+          window.location.href = 'admin-dashboard.html';
+        
+        // Then, check for standard User credentials
+        } else if (username === USER_CRED.user && password === USER_CRED.pass) {
+          console.log('Standard user login successful. Redirecting to landing_page.html');
           window.location.href = 'landing_page.html';
+        
+        // If neither matches, show an error
         } else {
+          console.error('Login failed. Credentials do not match.');
           warningEl.style.display = 'block';
           submitBtn.disabled = true;
         }
