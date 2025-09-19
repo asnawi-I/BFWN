@@ -293,6 +293,62 @@ function loadFromLocalStorage() {
     }
 }
 
+// save to localStorage on pageload
+function saveToLocalStorage() {
+
+  localStorage.setItem('PRIZE_DATABASE', JSON.stringify(PRIZE_DATABASE));
+  console.log("Admin: saved changes to local storage");
+}
+
+function autoCalculateProbabilities(editingPrizeId, newProbability) {
+    const prizes = PRIZE_DATABASE.branches[currentBranch].prizes;
+    const editingPrize = prizes.find(p => p.id === editingPrizeId);
+    
+    if (!editingPrize) return;
+    
+    // Set the edited prize to the new probability
+    editingPrize.probability = parseFloat(newProbability);
+    
+    // Calculate remaining probability to distribute
+    const remainingProbability = 100 - editingPrize.probability;
+    
+    // Get other prizes by category
+    const otherPrizes = prizes.filter(p => p.id !== editingPrizeId);
+    const categoryCounts = {
+        gold: otherPrizes.filter(p => p.category === 'gold').length,
+        silver: otherPrizes.filter(p => p.category === 'silver').length,
+        complimentary: otherPrizes.filter(p => p.category === 'complimentary').length
+    };
+    
+    // Define category weights (higher = more probability allocated)
+    const categoryWeights = {
+        gold: 0.1,        // Gold gets 10% of remaining
+        silver: 0.2,      // Silver gets 20% of remaining  
+        complimentary: 0.7 // Complimentary gets 70% of remaining
+    };
+    
+    // Calculate probability per category
+    const categoryAllocations = {
+        gold: remainingProbability * categoryWeights.gold,
+        silver: remainingProbability * categoryWeights.silver,
+        complimentary: remainingProbability * categoryWeights.complimentary
+    };
+    
+    // Distribute probability within each category
+    otherPrizes.forEach(prize => {
+        const categoryAllocation = categoryAllocations[prize.category];
+        const categoryCount = categoryCounts[prize.category];
+        
+        if (categoryCount > 0) {
+            prize.probability = parseFloat((categoryAllocation / categoryCount).toFixed(1));
+        } else {
+            prize.probability = 0;
+        }
+    });
+    
+    console.log('Auto-calculated probabilities complete');
+}
+
 window.addEventListener('storage', function(e) {
     if (e.key === 'PRIZE_DATABASE') {
         console.log('Storage updated, refreshing data...');
@@ -517,6 +573,16 @@ function editPrize(prizeId) {
     
     editingPrizeId = prizeId;
     document.getElementById('prizeModal').style.display = 'block';
+
+      document.getElementById('prizeProbability').addEventListener('input', function() {
+      if (editingPrizeId) {
+          const newProb = parseFloat(this.value) || 0;
+          if (newProb >= 0 && newProb <= 100) {
+              autoCalculateProbabilities(editingPrizeId, newProb);
+              loadPrizesTable(); 
+          }
+      }
+  });
 }
 
 function deletePrize(prizeId) {
@@ -526,6 +592,7 @@ function deletePrize(prizeId) {
     if (confirm(`Are you sure you want to delete "${prize.name}"?`)) {
         if (PRIZE_DATABASE.deletePrize(currentBranch, prizeId)) {
             alert('Prize deleted successfully!');
+            saveToLocalStorage();
             loadPrizesTable();
         } else {
             alert('Error deleting prize.');
@@ -625,33 +692,23 @@ document.getElementById('prizeForm').addEventListener('submit', function(e) {
         probability: document.getElementById('prizeProbability').value
     };
     
-    // Validate probability doesn't exceed 100%
-    const currentTotal = PRIZE_DATABASE.branches[currentBranch].prizes
-        .filter(p => p.id !== editingPrizeId)
-        .reduce((sum, prize) => sum + prize.probability, 0);
-    
-    if (currentTotal + parseFloat(prizeData.probability) > 100) {
-        alert('Total probability would exceed 100%. Please adjust the probability value.');
-        return;
-    }
-    
     let success = false;
     
     if (editingPrizeId) {
-        // Update existing prize
+        // For edits, auto-calculation already applied via input event
         success = PRIZE_DATABASE.updatePrize(currentBranch, editingPrizeId, prizeData);
-        if (success) {
-            alert('Prize updated successfully!');
-        }
     } else {
-        // Add new prize
+        // For new prizes, add then auto-calculate
         success = PRIZE_DATABASE.addPrize(currentBranch, prizeData);
         if (success) {
+            const newPrize = PRIZE_DATABASE.branches[currentBranch].prizes[PRIZE_DATABASE.branches[currentBranch].prizes.length - 1];
+            autoCalculateProbabilities(newPrize.id, parseFloat(prizeData.probability));
             alert('Prize added successfully!');
         }
     }
     
     if (success) {
+        saveToLocalStorage();
         closeModal();
         loadPrizesTable();
     } else {
@@ -673,6 +730,8 @@ window.onclick = function(event) {
         closeModal();
     }
   }
+
+  
 
 </script>
 </body>

@@ -167,7 +167,7 @@
         top: 200px;
         left: 200px;
         width: 70%;
-        height: 55%;
+        height: 56%;
         display: flex;
         justify-content: center;
         text-items: center;
@@ -601,7 +601,6 @@
             <div class="popup-body">
                 <div class="popup-message">You have won:</div>
                 <div class="popup-prize" id="popupPrizeText">Prize 1</div>
-                <div class="popup-description">womp womp</div>
             </div>
             <div class="popup-buttons">
                 <button class="popup-btn secondary" onclick="closePrizePopup()">Close</button>
@@ -810,15 +809,12 @@ function spinWheel() {
             const normalizedRotation = (360 - (currentRotation % 360) + 22.5) % 360;
             //const sliceIndex = Math.floor(normalizedRotation / 45) % 8;
             const sliceIndex = (Math.floor(normalizedRotation / 45) + 6) % 8;
-            console.log('visual check - rotation:', currentRotation.toFixed(1), 'normalized:', normalizedRotation.toFixed(1), 'slice index:', sliceIndex, 'expected colour:', colors[sliceIndex]);
 
             // Debug: Check what's actually at the pin position
             if (Math.abs(currentRotation % 360) < 5) { // When rotation is near 0
                 console.log('WHEEL AT START POSITION - Pin should point to slice 0, color should be:', colors[0]);
             }
             const sliceColor = colors[sliceIndex];
-            
-            console.log('Progress:', (progress * 100).toFixed(1) + '%', 'Rotation:', currentRotation.toFixed(1), 'Slice:', sliceIndex, 'Color:', sliceColor);
             
             document.documentElement.style.setProperty('--color-theme', sliceColor);
             
@@ -852,6 +848,14 @@ timeoutID = setTimeout(() => {
     
 
     const weightedPool = PRIZE_DATABASE.createWeightedPool(currentBranchKey);
+    console.log('WEIGHTED POOL DEBUG:', {
+        totalEntries: weightedPool.length,
+        breakdown: weightedPool.reduce((acc, prize) => {
+            acc[prize.category] = (acc[prize.category] || 0) + 1;
+            return acc;
+        }, {}),
+        prizeDistribution: weightedPool.map(p => p.name)
+    });
     
     if (weightedPool.length === 0) {
         alert('All prizes have been claimed!');
@@ -929,6 +933,7 @@ function backupToConsole() {
     console.log('CURRENT DATABASE BACKUP:', JSON.stringify(PRIZE_DATABASE, null, 2));
 }
 
+
 //show current inventory status
 function updateInventoryDisplay() {
     const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
@@ -940,7 +945,6 @@ function updateInventoryDisplay() {
         complimentary: availablePrizes.filter(p => p.category === 'complimentary').reduce((sum, p) => sum + p.quantity, 0)
     };
     
-    console.log('Current Inventory:', inventory);
     
     // If all prizes are gone, disable spinning
     if (availablePrizes.length === 0) {
