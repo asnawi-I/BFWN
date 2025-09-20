@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spin Wheel Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* General Body and Layout Styles */
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            background: #f0f2f5; 
+            color: #333;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: #fff;
+            height: 100vh;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            position: fixed;
+        }
+        
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ecf0f1;
+            border-bottom: 2px solid #34495e;
+            padding-bottom: 10px;
+        }
+        
+        .sidebar a {
+            display: block;
+            color: #bdc3c7;
+            padding: 12px 15px;
+            margin: 10px 0;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar a:hover { 
+            background: #34495e; 
+            color: #fff; 
+        }
+        
+        .sidebar a.active { 
+            background: #3498db; 
+            color: #fff; 
+        }
+
+        /* Main Content Area */
+        .main {
+            margin-left: 250px; /* Offset for fixed sidebar */
+            flex: 1;
+            padding: 30px;
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .branch-selector {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+            color: #2c3e50;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary { 
+            background: #3498db; 
+            color: #fff; 
+        }
+        .btn-primary:hover { 
+            background: #2980b9; 
+        }
+
+        /* KPI Cards */
+        .kpi-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 1em;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* Charts and Tables Section */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: relative;
+            height: 380px;
+        }
+
+        .chart-container h3 {
+            margin-top: 0;
+            text-align: center;
+            color: #34495e;
+            margin-bottom: 15px;
+        }
+        
+        /* Table Styles */
+        .table-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .table-container h3 {
+             margin-top: 0;
+             color: #34495e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        th {
+            background: #34495e;
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+        
+        tr:hover { 
+            background: #f8f9fa; 
+        }
+        
+        /* Winner Category Styles */
+        .category-gold { background: #f1c40f; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 0.8em; text-align: center; display: inline-block; }
+        .category-silver { background: #95a5a6; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 0.8em; text-align: center; display: inline-block; }
+        .category-complimentary { background: #27ae60; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 0.8em; text-align: center; display: inline-block; }
+
+        /* PDF Export Styling */
+        @media print {
+            body {
+                background: #fff;
+                display: block;
+            }
+            .sidebar, .header {
+                display: none;
+            }
+            .main {
+                margin-left: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+            .kpi-cards, .content-grid {
+                grid-template-columns: 1fr 1fr; /* Force two columns for printing */
+            }
+            .card, .chart-container, .table-container {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+            .table-container{
+                grid-column: span 2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <a href="#">Dashboard</a>
+        <a href="#">Manage Prizes</a>
+        <a href="#">Wheel Settings</a>
+        <a href="#">Spin Logs</a>
+        <a href="#" class="active">Analytics</a>
+    </div>
+
+    <div class="main" id="analytics-report">
+        <div class="header">
+            <h1>Analytics Dashboard</h1>
+            <div class="header-controls">
+                <select id="branch-selector" class="branch-selector">
+                    <option value="ALL">All Branches</option>
+                    <option value="Madang Branch">Madang Branch</option>
+                    <option value="Batu Satu Branch">Batu Satu Branch</option>
+                </select>
+                <button class="btn btn-primary" onclick="downloadPDF()">Download as PDF</button>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-cards">
+            <div class="card">
+                <div class="card-title">Total Spins</div>
+                <div class="card-value" id="total-spins">0</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Prizes Won</div>
+                <div class="card-value" id="total-prizes-won">0</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Average Prizes Won</div>
+                <div class="card-value" id="avg-prizes-won">0%</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Average Winners per Day</div>
+                <div class="card-value" id="avg-winners-day">0</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Prize Distribution Chart -->
+            <div class="chart-container">
+                <h3>Prize Distribution</h3>
+                <canvas id="prize-distribution-chart"></canvas>
+            </div>
+            <!-- Winners by Category Chart -->
+            <div class="chart-container">
+                <h3>Winners by Category</h3>
+                <canvas id="winners-category-chart"></canvas>
+            </div>
+             <!-- Weekend Trend Chart -->
+            <div class="chart-container" style="grid-column: span 2;">
+                <h3>Weekend Winner Trend</h3>
+                <canvas id="weekend-trend-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Winners Table -->
+        <div class="table-container">
+            <h3>Recent Winners</h3>
+            <table id="winners-table">
+                <thead>
+                    <tr>
+                        <th>Winner Name</th>
+                        <th>Prize Won</th>
+                        <th>Category</th>
+                        <th>Branch</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- JS will populate this -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // --- LIVE DATA SIMULATION ---
+        let mockWinners = [];
+        let totalSpinsData = { 'Madang Branch': 0, 'Batu Satu Branch': 0 };
+
+        function generateInitialData() {
+            const names = ['John D.', 'Jane S.', 'Peter J.', 'Mary W.', 'David B.', 'Susan D.', 'Emily C.', 'Chris G.', 'Patricia W.'];
+            const prizePool = [
+                { name: 'Gold Voucher', category: 'gold' },
+                { name: 'Silver Discount', category: 'silver' },
+                { name: 'Free Coffee', category: 'complimentary' }
+            ];
+            const branches = ['Madang Branch', 'Batu Satu Branch'];
+            
+            const now = new Date();
+            // Generate historical data for the past 10 days
+            for (let i = 10; i > 0; i--) {
+                const winnersToday = Math.floor(Math.random() * 4) + 1; // 1 to 4 winners per day
+                for (let j = 0; j < winnersToday; j++) {
+                    const date = new Date();
+                    date.setDate(now.getDate() - i);
+                    date.setHours(Math.floor(Math.random() * 12) + 9, Math.floor(Math.random() * 60));
+                    
+                    mockWinners.push({
+                        name: names[Math.floor(Math.random() * names.length)],
+                        prize: prizePool[Math.floor(Math.random() * prizePool.length)].name,
+                        category: prizePool[Math.floor(Math.random() * prizePool.length)].category,
+                        branch: branches[Math.floor(Math.random() * branches.length)],
+                        date: date.toISOString()
+                    });
+                }
+            }
+            totalSpinsData['Madang Branch'] = 250 + Math.floor(Math.random() * 50);
+            totalSpinsData['Batu Satu Branch'] = 210 + Math.floor(Math.random() * 50);
+        }
+
+        function simulateLiveUpdates() {
+            const randomInterval = Math.random() * 8000 + 4000; // 4-12 seconds
+
+            setTimeout(() => {
+                const branch = Math.random() > 0.5 ? 'Madang Branch' : 'Batu Satu Branch';
+                totalSpinsData[branch] += Math.floor(Math.random() * 3) + 1;
+
+                if (Math.random() < 0.25) { // 25% chance of a winner
+                    const names = ['Alice', 'Bob', 'Charlie', 'Diana', 'Evan', 'Fiona'];
+                    const prizePool = [
+                        { name: 'Gold Voucher', category: 'gold' },
+                        { name: 'Silver Discount', category: 'silver' },
+                        { name: 'Free Coffee', category: 'complimentary' }
+                    ];
+                    const randomPrize = prizePool[Math.floor(Math.random() * prizePool.length)];
+                    
+                    mockWinners.push({
+                        name: names[Math.floor(Math.random() * names.length)],
+                        prize: randomPrize.name,
+                        category: randomPrize.category,
+                        branch: branch,
+                        date: new Date().toISOString()
+                    });
+                }
+                renderAnalytics();
+                simulateLiveUpdates();
+            }, randomInterval);
+        }
+
+
+        // --- CHART & UI ELEMENT REFERENCES ---
+        let prizeDistChart, winnersCatChart, weekendTrendChart;
+        const branchSelector = document.getElementById('branch-selector');
+        
+        // --- EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            generateInitialData();
+            initializeCharts();
+            renderAnalytics(); // Initial render for "ALL"
+            simulateLiveUpdates(); // Start the live data feed
+        });
+
+        branchSelector.addEventListener('change', renderAnalytics);
+
+        // --- CORE FUNCTIONS ---
+        function renderAnalytics() {
+            const selectedBranch = branchSelector.value;
+            
+            const filteredWinners = selectedBranch === 'ALL'
+                ? mockWinners
+                : mockWinners.filter(w => w.branch === selectedBranch);
+
+            const totalSpins = selectedBranch === 'ALL'
+                ? Object.values(totalSpinsData).reduce((a, b) => a + b, 0)
+                : (totalSpinsData[selectedBranch] || 0);
+                
+            updateKpiCards(filteredWinners, totalSpins);
+            updatePrizeDistributionChart(filteredWinners);
+            updateWinnersCategoryChart(filteredWinners);
+            updateWeekendTrendChart(filteredWinners);
+            populateWinnersTable(filteredWinners);
+        }
+
+        function updateKpiCards(winners, spins) {
+            const totalPrizesWon = winners.length;
+            document.getElementById('total-spins').textContent = spins;
+            document.getElementById('total-prizes-won').textContent = totalPrizesWon;
+
+            const avgPrizesWon = spins > 0 ? ((totalPrizesWon / spins) * 100).toFixed(1) : 0;
+            document.getElementById('avg-prizes-won').textContent = `${avgPrizesWon}%`;
+
+            const uniqueDays = new Set(winners.map(w => new Date(w.date).toLocaleDateString()));
+            const avgWinnersDay = uniqueDays.size > 0 ? (totalPrizesWon / uniqueDays.size).toFixed(1) : 0;
+            document.getElementById('avg-winners-day').textContent = avgWinnersDay;
+        }
+
+        function populateWinnersTable(winners) {
+            const tableBody = document.querySelector('#winners-table tbody');
+            tableBody.innerHTML = '';
+            
+            const sortedWinners = winners.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedWinners.slice(0, 10).forEach(winner => { // Show only top 10 recent winners
+                const row = document.createElement('tr');
+                const formattedDate = new Date(winner.date).toLocaleString();
+                row.innerHTML = `
+                    <td>${winner.name}</td>
+                    <td>${winner.prize}</td>
+                    <td><span class="category-${winner.category}">${winner.category}</span></td>
+                    <td>${winner.branch}</td>
+                    <td>${formattedDate}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // --- CHARTING FUNCTIONS ---
+        function initializeCharts() {
+            Chart.defaults.font.family = "'Arial', sans-serif";
+            Chart.defaults.color = '#555';
+
+            const ctxPrize = document.getElementById('prize-distribution-chart').getContext('2d');
+            prizeDistChart = new Chart(ctxPrize, {
+                type: 'pie',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#f39c12', '#bdc3c7', '#1abc9c', '#3498db', '#e74c3c'],
+                        borderColor: '#fff',
+                        borderWidth: 4,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { 
+                            position: 'right',
+                            labels: {
+                                padding: 20,
+                                boxWidth: 15,
+                                font: { size: 14 }
+                            }
+                        } 
+                    }
+                }
+            });
+
+            const ctxWinners = document.getElementById('winners-category-chart').getContext('2d');
+            winnersCatChart = new Chart(ctxWinners, {
+                type: 'bar',
+                data: {
+                    labels: ['Gold', 'Silver', 'Complimentary'],
+                    datasets: [{
+                        label: 'Number of Winners', data: [],
+                        backgroundColor: ['#f1c40f', '#95a5a6', '#27ae60'],
+                        borderRadius: 5, 
+                        borderWidth: 0,
+                        barThickness: 30
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    return ` Winners: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            grid: { display: false },
+                            ticks: { font: { size: 14, weight: 'bold' } }
+                        },
+                        x: { 
+                            beginAtZero: true, 
+                            ticks: { precision: 0 }, 
+                            grid: { color: '#ecf0f1' } 
+                        }
+                    }
+                }
+            });
+
+            const ctxTrend = document.getElementById('weekend-trend-chart').getContext('2d');
+            weekendTrendChart = new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Winners', data: [],
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: '#3498db',
+                        borderWidth: 2, tension: 0.4, fill: true,
+                        pointBackgroundColor: '#3498db', pointRadius: 5, pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, title: {display: true, text: 'Recent Weekend Activity (Fri-Sun)'} },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#ecf0f1' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+        
+        function updatePrizeDistributionChart(winners) {
+            const prizeCounts = winners.reduce((acc, winner) => {
+                acc[winner.prize] = (acc[winner.prize] || 0) + 1;
+                return acc;
+            }, {});
+            prizeDistChart.data.labels = Object.keys(prizeCounts);
+            prizeDistChart.data.datasets[0].data = Object.values(prizeCounts);
+            prizeDistChart.update();
+        }
+
+        function updateWinnersCategoryChart(winners) {
+            const categoryCounts = { gold: 0, silver: 0, complimentary: 0 };
+            winners.forEach(winner => {
+                if (categoryCounts.hasOwnProperty(winner.category)) {
+                    categoryCounts[winner.category]++;
+                }
+            });
+            winnersCatChart.data.datasets[0].data = Object.values(categoryCounts);
+            winnersCatChart.update();
+        }
+
+        function updateWeekendTrendChart(winners) {
+            const weekendWinners = winners.filter(winner => {
+                const day = new Date(winner.date).getDay();
+                return day === 0 || day === 5 || day === 6; // 0=Sun, 5=Fri, 6=Sat
+            });
+            
+            const dailyCounts = weekendWinners.reduce((acc, winner) => {
+                const dateKey = new Date(winner.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                acc[dateKey] = (acc[dateKey] || 0) + 1;
+                return acc;
+            }, {});
+
+            const sortedDates = Object.keys(dailyCounts).sort((a, b) => new Date(a) - new Date(b));
+            const sortedCounts = sortedDates.map(date => dailyCounts[date]);
+
+            weekendTrendChart.data.labels = sortedDates;
+            weekendTrendChart.data.datasets[0].data = sortedCounts;
+            weekendTrendChart.update();
+        }
+
+        // --- PDF EXPORT FUNCTION ---
+        function downloadPDF() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
+
