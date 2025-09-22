@@ -306,48 +306,85 @@ function autoCalculateProbabilities(editingPrizeId, newProbability) {
     
     if (!editingPrize) return;
     
-    // Set the edited prize to the new probability
-    editingPrize.probability = parseFloat(newProbability);
+    // Set the edited prize to the new probability and lock it
+    editingPrize.probability = parseFloat(newProbability); 
     
-    // Calculate remaining probability to distribute
-    const remainingProbability = 100 - editingPrize.probability;
+    // Calculate total locked probability
+    const lockedPrizes = prizes.filter(p => p.locked && p.id !== editingPrizeId);
+    const unlockedPrizes = prizes.filter(p => !p.locked && p.id !== editingPrizeId);
+    const lockedTotal = lockedPrizes.reduce((sum, p) => sum + p.probability, 0) + editingPrize.probability;
     
-    // Get other prizes by category
-    const otherPrizes = prizes.filter(p => p.id !== editingPrizeId);
+    // Remaining probability for unlocked prizes
+    const remainingProbability = 100 - lockedTotal;
+
     const categoryCounts = {
-        gold: otherPrizes.filter(p => p.category === 'gold').length,
-        silver: otherPrizes.filter(p => p.category === 'silver').length,
-        complimentary: otherPrizes.filter(p => p.category === 'complimentary').length
-    };
+            gold: unlockedPrizes.filter(p => p.category === 'gold').length,
+            silver: unlockedPrizes.filter(p => p.category === 'silver').length,
+            complimentary: unlockedPrizes.filter(p => p.category === 'complimentary').length
+        };
+
+    //debug
+    console.log('=== AUTO-CALCULATION DEBUG ===');
+    console.log('Editing prize:', editingPrize.name, 'to', newProbability + '%');
+    console.log('Locked prizes:', lockedPrizes.map(p => p.name + ': ' + p.probability + '%'));
+    console.log('Unlocked prizes:', unlockedPrizes.map(p => p.name + ': ' + p.probability + '%'));
+    console.log('Locked total:', lockedTotal + '%');
+    console.log('Remaining for unlocked:', remainingProbability + '%');
+    console.log('Category counts:', categoryCounts);
     
-    // Define category weights (higher = more probability allocated)
-    const categoryWeights = {
-        gold: 0.1,        // Gold gets 10% of remaining
-        silver: 0.2,      // Silver gets 20% of remaining  
-        complimentary: 0.7 // Complimentary gets 70% of remaining
-    };
+    if (remainingProbability < 0) {
+        alert('Locked prizes exceed 100%. Please unlock some prizes.');
+        return;
+    }
     
-    // Calculate probability per category
-    const categoryAllocations = {
-        gold: remainingProbability * categoryWeights.gold,
-        silver: remainingProbability * categoryWeights.silver,
-        complimentary: remainingProbability * categoryWeights.complimentary
-    };
-    
-    // Distribute probability within each category
-    otherPrizes.forEach(prize => {
-        const categoryAllocation = categoryAllocations[prize.category];
-        const categoryCount = categoryCounts[prize.category];
+    // Distribute remaining probability among unlocked prizes
+    if (unlockedPrizes.length > 0) {
         
-        if (categoryCount > 0) {
-            prize.probability = parseFloat((categoryAllocation / categoryCount).toFixed(1));
-        } else {
-            prize.probability = 0;
-        }
-    });
     
-    console.log('Auto-calculated probabilities complete');
+    const baseShare = remainingProbability / unlockedPrizes.length;
+
+    unlockedPrizes.forEach(prize => {
+        let multiplier = 1;
+        if (prize.category === 'gold') multiplier = 0.3;
+        else if (prize.category === 'silver') multiplier = 0.6;
+        else if (prize.category === 'complimentary') multiplier = 1.5;
+        
+        prize.probability = parseFloat((baseShare * multiplier).toFixed(1));
+    });
+
+    // Final adjustment to ensure exact 100%
+    const currentTotal = prizes.reduce((sum, p) => sum + p.probability, 0);
+    const finalAdjustment = 100 - currentTotal;
+    if (unlockedPrizes.length > 0) {
+        unlockedPrizes[unlockedPrizes.length - 1].probability = parseFloat(
+            (unlockedPrizes[unlockedPrizes.length - 1].probability + finalAdjustment).toFixed(1)
+        );
+    }
+
+        const actualTotal = prizes.reduce((sum, p) => sum + p.probability, 0);
+        if (Math.abs(actualTotal - 100) < 0.01 && unlockedPrizes.length > 0) {
+            const adjustment = 100 - actualTotal;
+            const unlockedTotal = unlockedPrizes.reduce((sum, p) => sum + p.probability, 0);
+
+            if (unlockedTotal > 0) {
+              unlockedPrizes.forEach(prize => {
+                const proportion = prize.probability / unlockedTotal;
+                prize.probability = parseFloat((prize.probability + (adjustment * proportion)).toFixed(1));
+              });
+            }
+        }
+
+        console.log('Final probabilities:', prizes.map(p => p.name + ': ' + p.probability + '%'));
+
+        console.log('Final probabilities:', prizes.map(p => p.name + ': ' + p.probability + '%'));
+        console.log('Final total:', prizes.reduce((sum, p) => sum + p.probability, 0) + '%');
+        console.log('===============================');
+    }
+    
+    console.log('Auto-calculated with locked prizes');
 }
+
+
 
 window.addEventListener('storage', function(e) {
     if (e.key === 'PRIZE_DATABASE') {
@@ -373,6 +410,13 @@ setInterval(() => {
 // Call this when page loads
 document.addEventListener('DOMContentLoaded', function() {
     loadFromLocalStorage();
+
+    //restore last active session
+    const savedSection = localStorage.getItem('currentSection') || 'dashboard';
+    const savedSectionLink = document.querySelector(`a[onclick="showSection('${savedSection}')"]`);
+    if (savedSectionLink) {
+      savedSectionLink.click();
+    }
 });
 
 const PRIZE_DATABASE = {
@@ -381,24 +425,24 @@ const PRIZE_DATABASE = {
             id: 1,
             name: 'Batu Satu Branch',
             prizes: [
-                { id: 'B2', name: 'Gold Prize B2', category: 'gold', quantity: 1, probability: 5, available: true },
-                { id: 'B3', name: 'Gold Prize B3', category: 'gold', quantity: 1, probability: 5, available: true },
-                { id: 'B1', name: 'Silver Prize B1', category: 'silver', quantity: 1, probability: 15, available: true },
-                { id: 'B4', name: 'Silver Prize B4', category: 'silver', quantity: 1, probability: 15, available: true },
-                { id: 'COMP1', name: 'Complimentary Gift 1', category: 'complimentary', quantity: 50, probability: 25, available: true },
-                { id: 'COMP2', name: 'Complimentary Gift 2', category: 'complimentary', quantity: 50, probability: 30, available: true }
+                { id: 'B2', name: 'Gold Prize B2', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
+                { id: 'B3', name: 'Gold Prize B3', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
+                { id: 'B1', name: 'Silver Prize B1', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
+                { id: 'B4', name: 'Silver Prize B4', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
+                { id: 'COMP1', name: 'Complimentary Gift 1', category: 'complimentary', quantity: 50, probability: 25, available: true, active: true, locked: false },
+                { id: 'COMP2', name: 'Complimentary Gift 2', category: 'complimentary', quantity: 50, probability: 30, available: true, active: true, locked: false }
             ]
         },
         'madang': {
             id: 2,
             name: 'Madang Branch',
             prizes: [
-                { id: 'M2', name: 'Gold Prize M1', category: 'gold', quantity: 1, probability: 5, available: true },
-                { id: 'M3', name: 'Gold Prize M4', category: 'gold', quantity: 1, probability: 5, available: true },
-                { id: 'M1', name: 'Silver Prize M2', category: 'silver', quantity: 1, probability: 15, available: true },
-                { id: 'M4', name: 'Silver Prize M3', category: 'silver', quantity: 1, probability: 15, available: true },
-                { id: 'COMP3', name: 'Complimentary Gift 3', category: 'complimentary', quantity: 50, probability: 25, available: true },
-                { id: 'COMP4', name: 'Complimentary Gift 4', category: 'complimentary', quantity: 50, probability: 30, available: true }
+                { id: 'M2', name: 'Gold Prize M1', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
+                { id: 'M3', name: 'Gold Prize M4', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
+                { id: 'M1', name: 'Silver Prize M2', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
+                { id: 'M4', name: 'Silver Prize M3', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
+                { id: 'COMP3', name: 'Complimentary Gift 3', category: 'complimentary', quantity: 50, probability: 25, available: true, active: true, locked: false },
+                { id: 'COMP4', name: 'Complimentary Gift 4', category: 'complimentary', quantity: 50, probability: 30, available: true, active: true, locked: false }
             ]
         }
     },
@@ -424,6 +468,7 @@ const PRIZE_DATABASE = {
         this.branches[branchKey].prizes.push(newPrize);
         return true;
     },
+
     
     updatePrize: function(branchKey, prizeId, prizeData) {
         if (!this.branches[branchKey]) return false;
@@ -471,19 +516,22 @@ function showSection(sectionName) {
     const titles = {
         'dashboard': 'Dashboard',
         'prizes': 'Manage Prizes',
-        'wheel-settings': 'Wheel Settings',
-        'spin-logs': 'Spin Logs',
+        'wheelSettings': 'Wheel Settings',
+        'spinLogs': 'Spin Logs',
         'analytics': 'Analytics'
     };
     
     document.getElementById('pageTitle').textContent = titles[sectionName];
     
+    // Save current section to localStorage
+    localStorage.setItem('currentSection', sectionName);
+    
     // Load section-specific data
     if (sectionName === 'prizes') {
         loadPrizesTable();
-    } else if (sectionName === 'spin-logs') {
+    } else if (sectionName === 'spinLogs') {
         loadWinnerHistory();
-  }
+    }
 }
 
 function switchBranch() {
@@ -506,7 +554,7 @@ function loadPrizesTable() {
     const tableBody = document.getElementById('prizesTableBody');
     
     if (prizes.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No prizes found</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No prizes found</td></tr>';
         return;
     }
     
@@ -514,15 +562,18 @@ function loadPrizesTable() {
         const categoryClass = `category-${prize.category}`;
         const status = prize.quantity > 0 ? 'Available' : 'Out of Stock';
         const statusColor = prize.quantity > 0 ? '#27ae60' : '#e74c3c';
+        const lockIcon = prize.locked ? '<span style="color: #e74c3c; font-weight: bold; font-size: 0.9rem; ">[LOCKED]</span>' : '<span style="color: #27ae60; font-weight: bold; font-size: 0.9rem; ">[UNLOCKED]</span>';
         
         return `
             <tr>
                 <td>${prize.name}</td>
                 <td><span class="${categoryClass}">${prize.category.toUpperCase()}</span></td>
                 <td>${prize.quantity}</td>
-                <td>${prize.probability}</td>
+                <td>${prize.probability}% ${lockIcon}</td>
                 <td style="color: ${statusColor}; font-weight: bold;">${status}</td>
                 <td>
+                    <button class="btn" style="background: ${prize.locked ? '#e74c3c' : '#f39c12'}; color: white;" 
+                            onclick="toggleLock('${prize.id}')">${prize.locked ? 'Unlock' : 'Lock'}</button>
                     <button class="btn btn-warning" onclick="editPrize('${prize.id}')">Edit</button>
                     <button class="btn btn-danger" onclick="deletePrize('${prize.id}')">Delete</button>
                 </td>
@@ -550,7 +601,17 @@ function updateTotalProbability() {
     totalElement.innerHTML = `Total Probability: <span style="color: ${color}">${total.toFixed(1)}%</span>`;
     
     if (total !== 100) {
-        totalElement.innerHTML += ' <span style="color: #e74c3c; font-size: 0.9em;">(Should equal 100%)</span>';
+        totalElement.innerHTML += ' <span style="color: #e74c3c; font-size: 0.9rem;">(Should equal 100%)</span>';
+    }
+}
+
+// lock prizes probability
+function toggleLock(prizeId) {
+    const prize = PRIZE_DATABASE.branches[currentBranch].prizes.find(p => p.id === prizeId);
+    if (prize) {
+        prize.locked = !prize.locked;
+        saveToLocalStorage();
+        loadPrizesTable();
     }
 }
 

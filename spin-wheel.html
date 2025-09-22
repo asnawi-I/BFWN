@@ -502,23 +502,51 @@
 
             //get available prizes for a branch
             getAvailablePrizes: function(branchKey) {
-                if (!this.branches[branchKey]) return[];
-                return this.branches[branchKey].prizes.filter(prize => prize.quantity > 0 && prize.available);
+                if (!this.branches[branchKey]) return [];
+                
+                const prizes = this.branches[branchKey].prizes.filter(prize => prize.quantity > 0 && prize.available);
+                
+                // Check if probabilities total to 100%
+                const total = prizes.reduce((sum, prize) => sum + prize.probability, 0);
+                if (Math.abs(total - 100) > 0.1) {
+                    console.warn('Prize probabilities do not total 100%. Weighted system may be unstable.');
+                }
+                
+                return prizes;
             },
 
             //weighted prize pool
             createWeightedPool: function(branchKey) {
                 const availablePrizes = this.getAvailablePrizes(branchKey);
                 let weightedPool = [];
-
-                availablePrizes.forEach(prize => {
-                    for (let i = 0; i < prize.probability; i++){
+                
+                // Calculate current total
+                const currentTotal = availablePrizes.reduce((sum, prize) => sum + prize.probability, 0);
+                
+                // Only fix tiny floating point errors, preserve admin intentions
+                let finalPrizes = availablePrizes;
+                if (Math.abs(currentTotal - 100) < 0.01) {
+                    // Tiny floating point error (99.999999 vs 100) 
+                    const adjustment = (100 - currentTotal) / availablePrizes.length;
+                    finalPrizes = availablePrizes.map(prize => ({
+                        ...prize,
+                        probability: prize.probability + adjustment
+                    }));
+                    console.log('Applied micro-adjustment for floating point precision');
+                } else {
+                    // Use admin values as-is, even if total ≠ 100%
+                    console.log('Using admin probabilities as-is. Total:', currentTotal + '%');
+                }
+                
+                finalPrizes.forEach(prize => {
+                    const entries = Math.round(prize.probability);
+                    for (let i = 0; i < entries; i++) {
                         weightedPool.push(prize);
                     }
                 });
-
+                
                 return weightedPool;
-            },
+            }
 
             //prize quantity management
             winPrize: function(prizeId, branchKey, customerName, receiptNo) {
