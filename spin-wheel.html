@@ -350,6 +350,7 @@
 
 /* Responsive adjustments */
 
+
 /* Media query for 24-inch 
 @media screen and (max-width: 1920px) and (min-width: 1200px) {
     h1.main-title {
@@ -402,6 +403,8 @@
 }
 
 */
+
+
 
       /* Responsive design */
       @media (max-width: 768px) {
@@ -546,7 +549,7 @@
                 });
                 
                 return weightedPool;
-            }
+            },
 
             //prize quantity management
             winPrize: function(prizeId, branchKey, customerName, receiptNo) {
@@ -672,72 +675,67 @@
 
 
         function generateWheelFromPrizes() {
+    containerSlices.innerHTML = '';
+    document.querySelector('svg circle#slice').style.display = 'none';
+    
+    const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
+    if (availablePrizes.length === 0) {
+        alert('All prizes have been claimed!');
+        return;
+    }
+    
+    // Use actual prize names instead of categories
+    const prizeNames = availablePrizes.map(p => p.name);
+    const colors = ['#EA3B52', '#86BE4E', '#FFCA06', '#63CBD8', '#FF4B33', '#63CBD8', '#D81B2E', '#86BE4E'];
+    
+    // Generate wheel segments
+    for (let i = 0; i < 8; i++) {
+        const startAngle = (i * 45 - 22.5) * Math.PI / 180;
+        const endAngle = ((i + 1) * 45 - 22.5) * Math.PI / 180;
 
-            containerSlices.innerHTML = '';
+        const x1 = 50 + Math.cos(startAngle) * 46;
+        const y1 = 50 + Math.sin(startAngle) * 46;
+        const x2 = 50 + Math.cos(endAngle) * 46;
+        const y2 = 50 + Math.sin(endAngle) * 46;
 
-             document.querySelector('svg circle#slice').style.display = 'none';
-            
-            const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
-            if (availablePrizes.length === 0) {
-                alert('All prizes have been claimed!');
-                return;
-            }
-            
-            //  8 display segments with category representation
-            const displaySegments = [
-                { category: 'gold', color: '#EA3B52', text: 'GOLD PRIZE' },
-                { category: 'complimentary', color: '#86BE4E', text: 'GIFT' },
-                { category: 'silver', color: '#FFCA06', text: 'SILVER PRIZE' },
-                { category: 'complimentary', color: '#63CBD8', text: 'GIFT' },
-                { category: 'gold', color: '#FF4B33', text: 'GOLD PRIZE' },
-                { category: 'complimentary', color: '#63CBD8', text: 'GIFT' },
-                { category: 'silver', color: '#D81B2E', text: 'SILVER PRIZE' },
-                { category: 'complimentary', color: '#86BE4E', text: 'GIFT' }
-            ];
-            
-            // Generate wheel segments
-            for (let i = 0; i < 8; i++) {
-                const startAngle = (i * 45 - 22.5) * Math.PI / 180;
-                const endAngle = ((i + 1) * 45 - 22.5) * Math.PI / 180;
+        const path = `
+            <path d="M 50 50 L ${x1} ${y1} A 46 46 0 0 1 ${x2} ${y2} Z" 
+                  fill="${colors[i]}" 
+                  stroke="white" 
+                  stroke-width="0.5"/>
+        `;
+        containerSlices.innerHTML += path;
 
-                const x1 = 50 + Math.cos(startAngle) * 46;
-                const y1 = 50 + Math.sin(startAngle) * 46;
-                const x2 = 50 + Math.cos(endAngle) * 46;
-                const y2 = 50 + Math.sin(endAngle) * 46;
+        const midAngle = (i * 45) * Math.PI / 180;
+        const textX = 50 + Math.cos(midAngle) * 32; 
+        const textY = 50 + Math.sin(midAngle) * 32;
+        
+        /*// Use segment numbers for debugging
+        const prizeText = `Seg ${i}`; */
 
-                const segment = displaySegments[i];
-
-                const path = `
-                    <path d="M 50 50 L ${x1} ${y1} A 46 46 0 0 1 ${x2} ${y2} Z" 
-                          fill="${segment.color}" 
-                          stroke="white" 
-                          stroke-width="0.5"/>
-                `;
-                containerSlices.innerHTML += path;
-
-                const midAngle = (i * 45) * Math.PI / 180;
-                const textX = 50 + Math.cos(midAngle) * 32; 
-                const textY = 50 + Math.sin(midAngle) * 32;
-                
-                const textElement = `
-                    <text x="${textX}" y="${textY}" 
-                          text-anchor="middle" 
-                          dominant-baseline="middle"
-                          fill="white" 
-                          font-size="2.2" 
-                          font-weight="bold"
-                          font-family="Poppins"
-                          stroke="#000"
-                          stroke-width="0.1"
-                          class="prize-text">${segment.text}</text>
-                `;
-                containerSlices.innerHTML += textElement;
-            }
+        // Cycle through actual prize names
+        const prizeText = prizeNames[i % prizeNames.length];
+        
+        const textElement = `
+            <text x="${textX}" y="${textY}" 
+                  text-anchor="middle" 
+                  dominant-baseline="middle"
+                  fill="white" 
+                  font-size="2.2" 
+                  font-weight="bold"
+                  font-family="Poppins"
+                  stroke="#000"
+                  stroke-width="0.1"
+                  class="prize-text">${prizeText}</text>
+        `;
+        containerSlices.innerHTML += textElement;
+    }
 }
+
 
 let textUpdateInterval;
 
-function startPrizeAnimation() {
+function startPrizeAnimation() { 
     const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
     const allPrizeNames = availablePrizes.map(prize => prize.name);
     
@@ -747,7 +745,7 @@ function startPrizeAnimation() {
             const randomPrize = allPrizeNames[Math.floor(Math.random() * allPrizeNames.length)];
             textEl.textContent = randomPrize;
         });
-    }, 50);
+    }, 50); 
 }
 
 function stopPrizeAnimation() {
@@ -765,7 +763,6 @@ function spinWheel() {
     }
 
     isSpinning = true;
-
     startPrizeAnimation();
 
     [spinButton, pin].forEach(el => {
@@ -773,118 +770,10 @@ function spinWheel() {
         el.classList.add('isSpinning');
     });
 
-        
     const randomDuration = 4;
-    const randomRotate = randomInt(8, 15);
-
-    containerSlices.style.transition = 'none';
-    containerSlices.style.transform = 'rotate(0deg)';
-    containerSlices.offsetHeight;
-
-    const finalPrizeNumber = randomInt(1, 101);
-    const finalPrizeText = `Prize ${finalPrizeNumber}`;
-    const targetSlice = randomInt(0, 8);
-    const targetRotation = targetSlice * 45;
-    const textElements = containerSlices.querySelectorAll('.prize-text');
-
-    setTimeout(() => {    
-    containerSlices.style.transformOrigin = '50%';
-    containerSlices.style.transition = `transform ${randomDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
     
-
-    containerSlices.style.transform = `rotate(${3600 - targetRotation}deg)`;
-            
-    }, 50);
-
-    pin.style.animation = `pinWheel ${randomDuration / 8}s infinite ease-in-out`;
-
-
-    let colorStep = 0;
-    //const colorInterval = setInterval(() => {
-
-        // TRIAL 1
-       // const transformStyle = containerSlices.style.transform;
-       // const rotationMatch = transformStyle.match(/rotate\(([^)]+)deg\)/);
-       // const currentRotation = rotationMatch ? parseFloat(rotationMatch[1] % 360) : 0;
-
-        // TRIAL 2
-        //const computedStyle = window.getComputedStyle(containerSlices);
-        //const matrix = computedStyle.transform;
-
-        //let currentRotation = 0;
-        //if (matrix !== 'none') {
-        //    const matrixValues = matrix.match(/matrix.*\((.+)/)[1].split(', ');
-        //    const a = parseFloat(matrixValues[0]);
-        //    const b = parseFloat(matrixValues[1]);
-        //    currentRotation = Math.atan2(b, a) * (180 / Math.PI);
-        //}
-
-        const animationStartTime = Date.now();
-        const startRotation = 0;
-        const endRotation = 3600 - targetRotation;
-        const colors = ['#EA3B52', '#86BE4E', '#FFCA06', '#63CBD8', '#FF4B33', '#63CBD8', '#D81B2E', '#86BE4E'];
-
-        const colorInterval = setInterval(() => {
-            const elapsed = Date.now() - animationStartTime;
-            const progress = Math.min(elapsed / (randomDuration * 1000), 1);
-            
-            const easedProgress = progress < 0.5 
-                ? 2 * progress * progress 
-                : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-            
-            const currentRotation = startRotation + (endRotation - startRotation) * easedProgress;
-            
-            const normalizedRotation = (360 - (currentRotation % 360) + 22.5) % 360;
-            //const sliceIndex = Math.floor(normalizedRotation / 45) % 8;
-            const sliceIndex = (Math.floor(normalizedRotation / 45) + 6) % 8;
-
-            // Debug: Check what's actually at the pin position
-            if (Math.abs(currentRotation % 360) < 5) { // When rotation is near 0
-                console.log('WHEEL AT START POSITION - Pin should point to slice 0, color should be:', colors[0]);
-            }
-            const sliceColor = colors[sliceIndex];
-            
-            document.documentElement.style.setProperty('--color-theme', sliceColor);
-            
-            if (progress >= 1) {
-                clearInterval(colorInterval);
-            }
-        }, 50);
-
-
-
-setTimeout(() => {
-    stopPrizeAnimation();
-    
-    const transformStyle = containerSlices.style.transform;
-    const rotationMatch = transformStyle.match(/rotate\(([^)]+)deg\)/);
-    const currentRotation = rotationMatch ? parseFloat(rotationMatch[1]) : 0;
-    
-    const textElements = containerSlices.querySelectorAll('.prize-text');
-    textElements.forEach((textEl) => {
-        const x = parseFloat(textEl.getAttribute('x'));
-        const y = parseFloat(textEl.getAttribute('y'));
-        textEl.setAttribute('transform', `rotate(${-currentRotation}, ${x}, ${y})`);
-    });
-}, randomDuration * 1000 * 0.3); //adjust the randomisation
-
-timeoutID = setTimeout(() => {
-    pin.style.animation = '';
-
-    const userData = JSON.parse(sessionStorage.getItem('userFormData'));
-    const customerName = userData.name;
-    
-
+    // STEP 1: Select prize using probability FIRST
     const weightedPool = PRIZE_DATABASE.createWeightedPool(currentBranchKey);
-    console.log('WEIGHTED POOL DEBUG:', {
-        totalEntries: weightedPool.length,
-        breakdown: weightedPool.reduce((acc, prize) => {
-            acc[prize.category] = (acc[prize.category] || 0) + 1;
-            return acc;
-        }, {}),
-        prizeDistribution: weightedPool.map(p => p.name)
-    });
-    
     if (weightedPool.length === 0) {
         alert('All prizes have been claimed!');
         [spinButton, pin].forEach(el => {
@@ -895,37 +784,122 @@ timeoutID = setTimeout(() => {
         return;
     }
     
-
     const randomIndex = Math.floor(Math.random() * weightedPool.length);
     const selectedPrize = weightedPool[randomIndex];
     
-    // Update inventory
-    const success = PRIZE_DATABASE.winPrize(selectedPrize.id, currentBranchKey, customerName, userData.receiptNo);
-    
-    if (success) {
-         console.log('WINNER ADDED:', PRIZE_DATABASE.winners);
-         console.log('CURRENT BRANCH:', currentBranchKey); 
+    // STEP 2: Determine target segment and place selected prize there
+const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
+const prizeNames = availablePrizes.map(p => p.name);
+const prizeIndex = prizeNames.indexOf(selectedPrize.name);
+const targetSegment = prizeIndex % 8;
 
-        saveToLocalStorage();
-        backupToConsole();
+// Ensure the selected prize is placed at the target segment
+const textElements = containerSlices.querySelectorAll('.prize-text');
+textElements[targetSegment].textContent = selectedPrize.name;
 
-        // Update all text elements to show the won prize
-        const textElements = containerSlices.querySelectorAll('.prize-text');
-        textElements.forEach((textEl) => {
-            textEl.textContent = selectedPrize.name;
-        });
+    // Pin points to segment 6, so we need to rotate to bring target segment to segment 6 position
+    const segmentOffset = 6; // Pin points to segment 6
+    const rotationNeeded = (segmentOffset - targetSegment) * 45;
+    const spins = 3600; // Multiple full rotations for animation
+    const finalRotation = spins + rotationNeeded;
+
+    console.log('Selected prize:', selectedPrize.name, 'Target segment:', targetSegment, 'Rotation needed:', rotationNeeded);
+
+    // STEP 3: Spin to the calculated position
+    setTimeout(() => {
+        containerSlices.style.transformOrigin = '50%';
+        containerSlices.style.transition = `transform ${randomDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+        containerSlices.style.transform = `rotate(${finalRotation}deg)`;
+    }, 50);
+
+    pin.style.animation = `pinWheel ${randomDuration / 8}s infinite ease-in-out`;
+
+    // Color animation (keep your existing code)
+    const animationStartTime = Date.now();
+    const startRotation = 0;
+    const endRotation = finalRotation
+    const colors = ['#EA3B52', '#86BE4E', '#FFCA06', '#63CBD8', '#FF4B33', '#63CBD8', '#D81B2E', '#86BE4E'];
+
+    const colorInterval = setInterval(() => {
+        const elapsed = Date.now() - animationStartTime;
+        const progress = Math.min(elapsed / (randomDuration * 1000), 1);
         
-        setTimeout(() => {
-            showPrizePopup(selectedPrize.name);
-        }, 1000);
-    } else {
-        alert('Prize selection failed. Please try again.');
-    }
+        const easedProgress = progress < 0.5 
+            ? 2 * progress * progress 
+            : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        
+        const currentRotation = startRotation + (endRotation - startRotation) * easedProgress;
+        const normalizedRotation = (360 - (currentRotation % 360) + 22.5) % 360;
+        const sliceIndex = (Math.floor(normalizedRotation / 45) + 6) % 8;
+        const sliceColor = colors[sliceIndex];
+        
+        document.documentElement.style.setProperty('--color-theme', sliceColor);
+        
+        if (progress >= 1) {
+            clearInterval(colorInterval);
+        }
+    }, 50);
 
-    [spinButton, pin].forEach(el => {
-        el.classList.remove('isSpinning');
-        el.addEventListener('click', spinWheel);
-    });
+    // Stop animation and fix text rotation
+    setTimeout(() => {
+        stopPrizeAnimation();
+
+        const textElements = containerSlices.querySelectorAll('.prize-text');
+        textElements[targetSegment].textContent = selectedPrize.name;
+        
+        const transformStyle = containerSlices.style.transform;
+        const rotationMatch = transformStyle.match(/rotate\(([^)]+)deg\)/);
+        const currentRotation = rotationMatch ? parseFloat(rotationMatch[1]) : 0;
+        
+        textElements.forEach((textEl) => {
+            const x = parseFloat(textEl.getAttribute('x'));
+            const y = parseFloat(textEl.getAttribute('y'));
+            textEl.setAttribute('transform', `rotate(${-currentRotation}, ${x}, ${y})`);
+        });
+    }, randomDuration * 1000 * 0.3);
+
+
+    // Final win processing
+    timeoutID = setTimeout(() => {
+        pin.style.animation = '';
+
+        // Debug: Check what's actually at the pin position after spin
+        const finalRotation = parseFloat(containerSlices.style.transform.match(/rotate\(([^)]+)deg\)/)?.[1] || 0);
+        const normalizedRotation = finalRotation % 360;
+
+        console.log('=== FINAL POSITION DEBUG ===');
+        console.log('Final rotation:', finalRotation);
+        console.log('Normalized:', normalizedRotation);
+
+        // Check what segment is actually at the pin (top) position
+        const pinSegment = ((6 - Math.floor(normalizedRotation / 45)) % 8 + 8) % 8;
+        console.log('Segment at pin position:', pinSegment);
+        console.log('Text at that segment:', textElements[pinSegment]?.textContent);
+        console.log('Selected prize was:', selectedPrize.name);
+        console.log('==============================');
+        
+        const userData = JSON.parse(sessionStorage.getItem('userFormData'));
+        const customerName = userData.name;
+        
+        const success = PRIZE_DATABASE.winPrize(selectedPrize.id, currentBranchKey, customerName, userData.receiptNo);
+        
+        if (success) {
+            console.log('WINNER ADDED:', PRIZE_DATABASE.winners);
+            saveToLocalStorage();
+            backupToConsole();
+
+            
+            setTimeout(() => {
+                showPrizePopup(selectedPrize.name);
+            }, 1000);
+        } else {
+            alert('Prize selection failed. Please try again.');
+        }
+
+        [spinButton, pin].forEach(el => {
+            el.classList.remove('isSpinning');
+            el.addEventListener('click', spinWheel);
+        });
 
         isSpinning = false;
         clearTimeout(timeoutID);
