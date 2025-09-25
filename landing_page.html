@@ -233,6 +233,8 @@
 
         })
 
+
+
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('spinForm');
             const nameInput = document.getElementById('txtboxName');
@@ -333,6 +335,41 @@
             `;
             document.head.appendChild(style);
         });
+
+
+// Fullscreen functionality 
+let titleClickCount = 0;
+let titleClickTimer = null;
+
+document.querySelector('h1.title').addEventListener('click', function() {
+    titleClickCount++;
+    
+    if (titleClickCount === 1) {
+        titleClickTimer = setTimeout(() => {
+            titleClickCount = 0; 
+        }, 1000); 
+    }
+    
+    if (titleClickCount === 3) {
+        clearTimeout(titleClickTimer);
+        titleClickCount = 0;
+        toggleFullscreen();
+    }
+});
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        // Enter fullscreen
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log('Error attempting to enable fullscreen:', err.message);
+        });
+    } else {
+        // Exit fullscreen
+        document.exitFullscreen().catch(err => {
+            console.log('Error attempting to exit fullscreen:', err.message);
+        });
+    }
+}
     </script>
 </body>
 </html>
