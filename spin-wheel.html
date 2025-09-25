@@ -620,6 +620,11 @@
             }
         });
 
+        // swipe listeners to the wheel container
+        const wheelContainer = document.querySelector('.wheel-container');
+        wheelContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+        wheelContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
+
         setInterval(() => {
             updateInventoryDisplay();
         }, 5000);
@@ -1075,6 +1080,71 @@ function stopConfetti() {
     confettiContext.clearRect(0, 0, confettiW, confettiH);
 }
 
+// swipable function on the wheel (another alternative for button)
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
+function handleTouchStart(event) {
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+}
+
+function handleTouchEnd(event) {
+    touchEndX = event.changedTouches[0].clientX;
+    touchEndY = event.changedTouches[0].clientY;
+    
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+    const minSwipeDistance = 50; // Minimum swipe distance in pixels
+    
+    // Check if it's a significant swipe (not just a tap)
+    if (Math.abs(deltaX) > minSwipeDistance || Math.abs(deltaY) > minSwipeDistance) {
+        // Trigger the same spin function as the button
+        spinWheel();
+    }
+}
+
+// Fullscreen functionality - triple click on title
+let titleClickCount = 0;
+let titleClickTimer = null;
+
+document.querySelector('h1.main-title').addEventListener('click', function() {
+    titleClickCount++;
+    
+    if (titleClickCount === 1) {
+        titleClickTimer = setTimeout(() => {
+            titleClickCount = 0; // Reset if not triple clicked within time limit
+        }, 1000); // 1 second window for triple click
+    }
+    
+    if (titleClickCount === 3) {
+        clearTimeout(titleClickTimer);
+        titleClickCount = 0;
+        toggleFullscreen();
+    }
+});
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        // Enter fullscreen
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log('Error attempting to enable fullscreen:', err.message);
+        });
+    } else {
+        // Exit fullscreen
+        document.exitFullscreen().catch(err => {
+            console.log('Error attempting to exit fullscreen:', err.message);
+        });
+    }
+}
+
+
+
 </script>
 </body>
 </html>
+
+
+
