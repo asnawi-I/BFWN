@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spinner Wheel</title>
+<style>
+  body {
+    font-family: sans-serif;
+    margin: 0;
+    background: #FBFCF8;
+    overflow-x: hidden;
+  }
+
+  .container {
+    position: relative;
+    max-width: 800px;
+    margin: 2rem auto;
+  }
+
+  .spinner-table {
+    height: 348px;
+    width: 348px;
+    position: relative;
+    border-radius: 100%;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .dial {
+    height: 100%;
+    transition: all 5s ease-out;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+  }
+  .dial.spinning {
+    animation-duration: 5s;
+    animation-timing-function: cubic-bezier(0.44, -0.205, 0, 1.13);
+  }
+  .dial:before {
+    content: "";
+    text-align: center;
+    display: block;
+    line-height: 60px;
+    position: absolute;
+    height: 40px;
+    width: 40px;
+    background: #FBFCF8;
+    box-shadow: 0 0 8px 3px rgba(0, 0, 0, 0.15);
+    top: 50%;
+    left: 50%;
+    margin-top: -20px;
+    margin-left: -20px;
+    border-radius: 100%;
+    z-index: 200;
+  }
+  .dial .slice {
+    z-index: 150;
+    position: absolute;
+    top: calc(50% - 45.8148928635px);
+    height: 91.6297857271px;
+    left: 50%;
+    width: 50%;
+    color: #FBFCF8;
+    text-align: right;
+    padding-right: 10px;
+    display: block;
+    transform-origin: left center;
+  }
+  .dial .slice:before, .dial .slice:after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+  }
+  .dial .slice:before {
+    margin-bottom: -1px;
+    margin-top: -2px;
+    border-width: 0 0 49.8148928635px 175px;
+    border-color: transparent transparent #EA3B52 transparent;
+  }
+  .dial .slice:after {
+    margin-top: -1px;
+    margin-bottom: -2px;
+    border-width: 0 175px 49.8148928635px 0;
+    border-color: transparent #EA3B52 transparent transparent;
+  }
+  .dial .slice:nth-child(even):after {
+    border-color: transparent #D81B2E transparent transparent;
+  }
+  .dial .slice:nth-child(even):before {
+    border-color: transparent transparent #D81B2E transparent;
+  }
+  .dial .slice:nth-child(3n):after {
+    border-color: transparent #86BE4E transparent transparent;
+  }
+  .dial .slice:nth-child(3n):before {
+    border-color: transparent transparent #86BE4E transparent;
+  }
+  .dial .slice:nth-child(4n):after {
+    border-color: transparent #63CBD8 transparent transparent;
+  }
+  .dial .slice:nth-child(4n):before {
+    border-color: transparent transparent #63CBD8 transparent;
+  }
+  .dial .slice .label {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 70%;
+    line-height: 91.6297857271px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: right;
+    padding-left: 20px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  .dial .slice:nth-child(1) {
+    transform: rotate(0deg);
+  }
+  .dial .slice:nth-child(2) {
+    transform: rotate(30deg);
+  }
+  .dial .slice:nth-child(3) {
+    transform: rotate(60deg);
+  }
+  .dial .slice:nth-child(4) {
+    transform: rotate(90deg);
+  }
+  .dial .slice:nth-child(5) {
+    transform: rotate(120deg);
+  }
+  .dial .slice:nth-child(6) {
+    transform: rotate(150deg);
+  }
+  .dial .slice:nth-child(7) {
+    transform: rotate(180deg);
+  }
+  .dial .slice:nth-child(8) {
+    transform: rotate(210deg);
+  }
+  .dial .slice:nth-child(9) {
+    transform: rotate(240deg);
+  }
+  .dial .slice:nth-child(10) {
+    transform: rotate(270deg);
+  }
+  .dial .slice:nth-child(11) {
+    transform: rotate(300deg);
+  }
+  .dial .slice:nth-child(12) {
+    transform: rotate(330deg);
+  }
+
+  @keyframes rotating {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .arrow {
+    position: absolute;
+    height: 60px;
+    width: 80px;
+    left: 380px;
+    z-index: 500;
+    display: block;
+    top: 50%;
+    margin-top: -30px;
+    transform-origin: center right;
+  }
+
+  .pointer {
+    z-index: 500;
+    display: block;
+    height: 60px;
+    width: 80px;
+    position: relative;
+  }
+  
+  .pointer:before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 30px 60px 30px 0;
+    border-color: transparent #FF4B33 transparent transparent;
+  }
+  
+  .pointer:after {
+    content: "";
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 15px;
+    width: 50px;
+    height: 30px;
+    background: #FF4B33;
+  }
+
+  .board {
+    position: relative;
+    background: white;
+    padding: 50px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #E2E8F0;
+  }
+
+  button {
+    background: #FF4B33;
+    border: 0;
+    padding: 15px 50px;
+    color: #FBFCF8;
+    position: absolute;
+    top: 50%;
+    margin-top: -20px;
+    right: 20%;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(255, 75, 51, 0.3);
+  }
+  
+  button:hover:not(:disabled) {
+    background: #EA3B52;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 75, 51, 0.4);
+  }
+  
+  button:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+  }
+
+  .modal.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-content {
+    background-color: white;
+    padding: 40px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: 2px solid #E2E8F0;
+    max-width: 400px;
+    animation: slideUp 0.5s ease;
+    position: relative;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .modal-content h2 {
+    color: #1A202C;
+    font-size: 32px;
+    margin: 0 0 20px 0;
+  }
+
+  .modal-content p {
+    color: #4A5568;
+    font-size: 18px;
+    margin: 10px 0 20px 0;
+  }
+
+  .winner-number {
+    color: #EA3B52;
+    font-size: 64px;
+    font-weight: bold;
+    margin: 20px 0 30px 0;
+    width: 100%;
+  }
+
+  .close-btn {
+    background: #86BE4E;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0;
+    transition: all 0.3s ease;
+    width: fit-content;
+  }
+
+  .close-btn:hover {
+    background: #00693E;
+    transform: translateY(-2px);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Fireworks */
+  .firework {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  @keyframes explode {
+    0% {
+      transform: translate(0, 0);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(var(--x), var(--y));
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="board">
+      <div class="spinner-table"> 
+        <div class="dial">
+          <div class="slice"><div class="label">1</div></div>
+          <div class="slice"><div class="label">2</div></div>
+          <div class="slice"><div class="label">3</div></div>
+          <div class="slice"><div class="label">4</div></div>
+          <div class="slice"><div class="label">5</div></div>
+          <div class="slice"><div class="label">6</div></div>
+          <div class="slice"><div class="label">7</div></div>
+          <div class="slice"><div class="label">8</div></div>
+          <div class="slice"><div class="label">9</div></div>
+          <div class="slice"><div class="label">10</div></div>
+          <div class="slice"><div class="label">11</div></div>
+          <div class="slice"><div class="label">12</div></div>
+        </div>
+      </div>
+      <div class="arrow">
+        <span class="pointer"></span>
+      </div>
+    </div>
+    
+    <div class="content-container">
+      <div class="pre">
+        <button id="spin">Spin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="winnerModal" class="modal">
+    <div class="modal-content">
+      <h2>🎉 Congratulations! 🎉</h2>
+      <p>The winner is:</p>
+      <div class="winner-number" id="winnerNumber">0</div>
+      <button class="close-btn" id="closeModal">Spin Again</button>
+    </div>
+  </div>
+
+  <script>
+    const spinButton = document.getElementById('spin');
+    const dial = document.querySelector('.dial');
+    const modal = document.getElementById('winnerModal');
+    const winnerNumber = document.getElementById('winnerNumber');
+    const closeModal = document.getElementById('closeModal');
+
+    function createFirework(x, y) {
+      const colors = ['#EA3B52', '#FF4B33', '#FFCA06', '#86BE4E', '#63CBD8'];
+      const particleCount = 30;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'firework';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        const angle = (Math.PI * 2 * i) / particleCount;
+        const velocity = 100 + Math.random() * 100;
+        const xVel = Math.cos(angle) * velocity;
+        const yVel = Math.sin(angle) * velocity;
+        
+        particle.style.setProperty('--x', xVel + 'px');
+        particle.style.setProperty('--y', yVel + 'px');
+        particle.style.animation = 'explode 1s ease-out forwards';
+        
+        document.body.appendChild(particle);
+        
+        setTimeout(() => {
+          particle.remove();
+        }, 1000);
+      }
+    }
+
+    function launchFireworks() {
+      const duration = 3000;
+      const interval = 300;
+      let elapsed = 0;
+      
+      const fireworkInterval = setInterval(() => {
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * (window.innerHeight * 0.6);
+        createFirework(x, y);
+        
+        elapsed += interval;
+        if (elapsed >= duration) {
+          clearInterval(fireworkInterval);
+        }
+      }, interval);
+    }
+
+    function getSliceColor(sliceNumber) {
+      if (sliceNumber % 4 === 0) return '#63CBD8';
+      if (sliceNumber % 3 === 0) return '#86BE4E';
+      if (sliceNumber % 2 === 0) return '#D81B2E';
+      return '#EA3B52';
+    }
+
+    spinButton.addEventListener('click', () => {
+      spinButton.disabled = true;
+      
+      const winner = Math.floor(Math.random() * 12) + 1;
+      const winnerColor = getSliceColor(winner);
+      
+      const degreesPerSlice = 30;
+      const winnerRotation = (winner - 1) * degreesPerSlice;
+      const extraSpins = 360 * 5;
+      const totalRotation = extraSpins + (360 - winnerRotation);
+      
+      dial.style.animation = 'none';
+      dial.offsetHeight;
+      dial.style.animation = `spin-to-winner 5s cubic-bezier(0.44, -0.205, 0, 1.13) forwards`;
+      
+      const styleSheet = document.styleSheets[0];
+      const keyframes = `
+        @keyframes spin-to-winner {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(${totalRotation}deg);
+          }
+        }
+      `;
+      
+      for (let i = styleSheet.cssRules.length - 1; i >= 0; i--) {
+        if (styleSheet.cssRules[i].name === 'spin-to-winner') {
+          styleSheet.deleteRule(i);
+        }
+      }
+      styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
+      
+      setTimeout(() => {
+        const pointer = document.querySelector('.pointer');
+        pointer.style.setProperty('--arrow-color', winnerColor);
+        
+        const pointerBefore = pointer.querySelector(':before');
+        const pointerAfter = pointer.querySelector(':after');
+        
+        pointer.style.transition = 'all 0.5s ease';
+        
+        const beforeStyle = document.createElement('style');
+        beforeStyle.textContent = `
+          .pointer:before {
+            border-color: transparent ${winnerColor} transparent transparent !important;
+          }
+          .pointer:after {
+            background: ${winnerColor} !important;
+          }
+        `;
+        document.head.appendChild(beforeStyle);
+        
+        winnerNumber.textContent = winner;
+        modal.classList.add('show');
+        launchFireworks();
+        spinButton.disabled = false;
+      }, 5000);
+    });
+
+    closeModal.addEventListener('click', () => {
+      modal.classList.remove('show');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>
