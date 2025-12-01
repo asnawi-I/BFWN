@@ -27,9 +27,9 @@
           color: var(--color-theme);
           font-family: var(--font-main);
           overflow: hidden;
-          display: flex; /* Added for centering the landing page */
-          justify-content: center; /* Added for centering the landing page */
-          align-items: center; /* Added for centering the landing page */
+          display: flex;
+          justify-content: center;
+          align-items: center;
       }
 
       /* ============================= */
@@ -62,7 +62,7 @@
         }
 
         .form-label {
-            color: #1A202C; /* Changed from #FBCF8 to be visible */
+            color: #1A202C;
             font-size: 1.2rem;
             margin-bottom: 8px;
             display: block;
@@ -104,7 +104,6 @@
             box-shadow: 0 0 10px rgba(255, 75, 51, 0.3);
         }
 
-        /* Renamed to .landing-button to avoid conflict with wheel's .spin-button */
         .landing-button {
             width: 100%;
             padding: 15px 30px;
@@ -170,11 +169,10 @@
       /* STYLES FROM spin-wheel.html */
       /* ============================ */
 
-      /* This container will be hidden by default */
       #wheel-app-container {
         display: none;
-        width: 100%; /* Ensure it takes full space */
-        height: 100%; /* Ensure it takes full space */
+        width: 100%;
+        height: 100%;
       }
 
       h1 {
@@ -309,14 +307,13 @@
       /*popup modal*/
       .popup-overlay {
         position: fixed;
-        /* Modified from original for better centering */
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         display: flex;
         justify-content: center;
-        align-items: center; /* Changed from text-items */
+        align-items: center; 
         z-index: 2000;
         opacity: 0;
         visibility: hidden;
@@ -492,6 +489,84 @@
     }
 
 
+    /* --- RECENT WINNERS TICKER --- */
+
+    .recent-winners {
+        position: absolute;
+        top: 175px;
+        right: 13%; /* Mirrored position from the User Info box */
+        z-index: 20;
+        background: rgba(251, 252, 248, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 15px 22px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(234, 59, 82, 0.3);
+        font-family: var(--font-main);
+        width: 300px; /* Base width for laptop */
+        height: 160px; /* Fixed height for scrolling area */
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .winners-header {
+        color: #ea3b52;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .winners-marquee {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .winners-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 100%;
+        animation: scrollUp 10s linear infinite; /* Auto-scroll animation */
+    }
+
+    .winners-list li {
+        font-size: 0.9rem;
+        color: #333;
+        padding: 6px 0;
+        border-bottom: 1px dashed #eee;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .winners-list li .winner-name {
+        font-weight: 600;
+        color: #001C34;
+    }
+
+    .winners-list li .winner-prize {
+        color: #86BE4E; /* Green text for prize */
+        font-weight: 500;
+    }
+
+    /* Pause scrolling when hovering (optional, mainly for mouse users) */
+    .recent-winners:hover .winners-list {
+        animation-play-state: paused;
+    }
+
+    @keyframes scrollUp {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(-50%); } 
+    }
+
+
       /* Responsive design */
       @media (max-width: 768px) {
           .wheel-container {
@@ -503,13 +578,11 @@
             font-size: 2.5rem;
         }
 
-        /* This rule was for the old button, updated to new class */
         .landing-button {
             padding: 1.2rem 2.4rem;
             font-size: 1.6rem;
         }
 
-        /* Added responsive for landing container */
         .landing-container {
             padding: 30px 20px;
         }
@@ -528,96 +601,108 @@
         
         /* Main Title */
         h1.main-title {
-            font-size: 220px; /* */
-            top: 75px; /* */
+            font-size: 220px; 
+            top: 75px; 
             margin-top: 0;
-            letter-spacing: 5px; /* */
-            text-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4); /* */
+            letter-spacing: 5px; 
+            text-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4); 
         }
 
         /* Wheel Container */
         .wheel-container {
-            width: 2500px; /* */
-            height: 2500px; /* */
-            bottom: -40%; /* */
-            filter: drop-shadow(0 40px 80px rgba(0, 0, 0, 0.6)); /* */
+            width: 2500px; 
+            height: 2500px; 
+            bottom: -40%; 
+            filter: drop-shadow(0 40px 80px rgba(0, 0, 0, 0.6)); 
         }
 
         .wheel-container::before {
-            border-radius: 80%; /* */
+            border-radius: 80%; 
         }
         
         /* Spin Button */
         .spin-button {
-            width: 650px; /* */
-            height: 650px; /* */
-            font-size: 150px; /* */
-            border-width: 30px; /* */
-            padding-top: 120px; /* Proportional adjustment */
+            width: 650px; 
+            height: 650px; 
+            font-size: 150px; 
+            border-width: 30px; 
+            padding-top: 120px; 
             box-shadow: 
-                0 24px 48px rgba(0,0,0,0.3), /* */
+                0 24px 48px rgba(0,0,0,0.3), 
                 0 12px 24px rgba(0,0,0,0.2),
                 inset 0 4px 8px rgba(255,255,255,0.9),
                 inset 0 -8px 16px rgba(0,0,0,0.2);
         }
 
-        /* Pin (using 6% as recommended by original CSS and PDF note) */
+        /* Pin */
         svg#pin {
-            width: 6%; /* 6% of 2500px = 150px */
-            height: 6%; /* 6% of 2500px = 150px */
+            width: 6%; 
+            height: 6%; 
         }
         
         /* User Info Box */
         .user-info {
-            top: 300px; /* */
-            left: 180px; /* */
-            transform: none; /* Removed transform to use direct positioning */
-            min-width: 480px; /* */
-            padding: 30px; /* */
-            border-radius: 25px; /* */
-            backdrop-filter: blur(10px); /* */
+            top: 300px; 
+            left: 180px; 
+            transform: none; 
+            min-width: 480px; 
+            padding: 30px; 
+            border-radius: 25px; 
+            backdrop-filter: blur(10px); 
         }
 
         .user-info .welcome-text {
-            font-size: 30px; /* */
+            font-size: 30px; 
         }
 
         .user-info .details-text {
-            font-size: 20px; /* */
+            font-size: 20px; 
+        }
+
+        /* Recent Winners Ticker (4K) */
+        .recent-winners {
+            top: 300px; /* Aligned with user-info */
+            right: 180px;
+            width: 480px;  
+            height: 300px; /* Taller area for 4K */
+            padding: 30px;
+            border-radius: 25px;
+            border-width: 4px;
+        }
+
+        .winners-header {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+        }
+
+        .winners-list li {
+            font-size: 1.4rem;
+            padding: 12px 0;
+        }
+        
+        .trophy-icon {
+            font-size: 2rem;
         }
         
         /* Popup Modal */
-        .popup-overlay {
-            /* Positioning is already full-screen flex center */
-        }
-        
         .popup-content {
-            max-width: 750px; /* */
-            border-width: 7px; /* */
-            border-radius: 25px; /* */
-        }
-
-        .popup-header {
-            font-size: 34px; /* */
-        }
-        
-        .popup-prize {
-            font-size: 68px; /* */
+            transform: scale(2.5) !important;
+            margin-top: 200px; 
         }
         
         /* Custom adjustment for wheel prize text */
         .prize-text {
-            font-size: 3.5 !important; /* Scaled up for 4K display */
+            font-size: 3.5 !important; 
         }
     }
-
     
 </style>
 </head>
 <body>
 
     <div class="landing-container" id="landing-container">
-        <h1 class="landing-title">BUY FIRST, WIN NOW!</h1>
+        <h1 class="landing-title"></h1>
         
         <form id="spinForm">
             <div class="form-group">
@@ -678,7 +763,18 @@
             </div>
         </div>
 
+        <div class="recent-winners" id="recentWinners">
+            <div class="winners-header">
+                <span class="trophy-icon">🏆</span> Recent Winners
+            </div>
+            <div class="winners-marquee">
+                <ul class="winners-list" id="winnersList">
+                    <li class="empty-state">No winners yet. Be the first!</li>
+                </ul>
+            </div>
         </div>
+
+    </div>
 
 
     <script>
@@ -1005,6 +1101,7 @@
             currentBranchPrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
 
             generateWheelFromPrizes();
+            updateWinnersTicker(); // Update ticker when wheel loads
 
             console.log('Loaded prizes for', currentBranchKey, ':', currentBranchPrizes);
         } else {
@@ -1295,6 +1392,7 @@
                 console.log('WINNER ADDED:', PRIZE_DATABASE.winners);
                 saveToLocalStorage();
                 backupToConsole();
+                updateWinnersTicker(); // Update ticker on win
 
                 
                 setTimeout(() => {
@@ -1369,19 +1467,55 @@
         return true;
     }
 
-    function showRecentWinners() {
-        const recentWinners = PRIZE_DATABASE.winners
-            .filter(w => w.branchId === currentBranchKey)
-            .slice(-5); // Last 5 winners
+    // --- WINNER TICKER LOGIC ---
+
+    function updateWinnersTicker() {
+        const listElement = document.getElementById('winnersList');
         
-        console.log('Recent winners:', recentWinners);
-        return recentWinners;
+        // 1. Filter winners for the current branch
+        const branchWinners = PRIZE_DATABASE.winners
+            .filter(w => w.branchId === currentBranchKey)
+            .reverse() // Show newest first
+            .slice(0, 10); // Limit to last 10 winners
+
+        if (branchWinners.length === 0) {
+            listElement.innerHTML = '<li class="empty-state" style="text-align:center; padding-top:20px; color:#999;">No winners yet today.<br><strong>Spin to win!</strong></li>';
+            return;
+        }
+
+        // 2. Build HTML
+        let htmlContent = '';
+        
+        branchWinners.forEach(w => {
+            // Privacy mask: "John" -> "John" | "John Doe" -> "John D."
+            let displayName = w.customerName;
+            if(displayName.includes(' ')) {
+                const parts = displayName.split(' ');
+                displayName = parts[0] + ' ' + parts[1][0] + '.';
+            }
+
+            htmlContent += `
+                <li>
+                    <span class="winner-name">${displayName}</span>
+                    <span class="winner-prize">${w.prize}</span>
+                </li>
+            `;
+        });
+
+        // 3. Duplicate content for seamless infinite scrolling
+        listElement.innerHTML = htmlContent + htmlContent;
     }
 
 
-    // confetti system
-    // == MODIFIED per PDF ==
-    const NUM_CONFETTI = 550; // (Increased from 350)
+    // --- CONFETTI SYSTEM 4K OPTIMIZED ---
+
+    // 1. Detect if we are on a large screen (4K width is usually 3840px)
+    // We create a scale factor: 1 for laptops, ~2.5 for 4K screens
+    const scaleFactor = Math.min(Math.max(window.innerWidth / 1500, 1), 3);
+
+    // 2. Increase particle count for 4K resolution
+    const NUM_CONFETTI = Math.floor(350 * (scaleFactor > 1.5 ? 1.5 : 1));
+
     const COLORS = [[234, 59, 82], [134, 190, 78], [255, 202, 6], [99, 203, 216], [255, 75, 51]];
     const PI_2 = 2 * Math.PI;
     let confettiCanvas = document.getElementById('confetti-canvas');
@@ -1413,8 +1547,10 @@
         constructor() {
             this.style = COLORS[Math.floor(range(0, 5))];
             this.rgb = `rgba(${this.style[0]},${this.style[1]},${this.style[2]}`;
-            // == MODIFIED per PDF ==
-            this.r = Math.floor(range(6, 12)); // (Increased from 2, 6)
+            
+            // --- 4K MODIFICATION: SIZE ---
+            this.r = Math.floor(range(2, 6) * scaleFactor);
+            
             this.r2 = 2 * this.r;
             this.replace();
         }
@@ -1426,8 +1562,13 @@
             this.y = range(-20, confettiH - this.r2);
             this.xmax = confettiW - this.r;
             this.ymax = confettiH - this.r;
-            this.vx = range(0, 2) + 8 * 0.5 - 5; 
-            this.vy = 0.7 * this.r + range(-1, 1);
+            
+            // --- 4K MODIFICATION: VELOCITY ---
+            // Gravity needs to be stronger on 4K or they float too slowly down the 2160px height
+            const speedScale = scaleFactor > 1 ? 1.5 : 1;
+            
+            this.vx = (range(0, 2) + 8 * 0.5 - 5) * speedScale; 
+            this.vy = (0.7 * this.r + range(-1, 1)) * (speedScale * 0.8); 
         }
 
         draw() {
