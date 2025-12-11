@@ -33,7 +33,7 @@
       }
 
       /* ============================= */
-      /* STYLES FROM landing_page.html */
+      /* STYLES for landing page */
       /* ============================= */
 
       .landing-container {
@@ -165,8 +165,18 @@
             box-shadow:0 6px 12px rgba(0, 0, 0, 0.4) ;
         }
 
+        /*limit*/
+        .limit-message {
+            color: #ea3b52;       /* Red theme color */
+            font-size: 0.85rem;
+            margin-top: 5px;
+            font-weight: 500;
+            display: none;        /* Hidden by default */
+            font-style: italic;
+        }
+
       /* ============================ */
-      /* STYLES FROM spin-wheel.html */
+      /* STYLES for spin wheel */
       /* ============================ */
 
       #wheel-app-container {
@@ -240,7 +250,7 @@
 
       .spin-button {
           position: absolute;
-          top: 580px;
+          top: 570px;
           left: 50%;
           transform: translate(-50%, -50%);
           width: 400px;
@@ -452,35 +462,46 @@
       .user-info {
         position: absolute;
         top: 175px;
-        left: 13%;
-        transform: translateX(-50%);
+        
+        left: -12px; 
+        transform: none; 
+        
+        width: fit-content;
+        max-width: 300px;   /* Prevents box from hitting the wheel */
+        min-width: 450px;
+        
         z-index: 20;
         background: rgba(251, 252, 248, 0.95);
         backdrop-filter: blur(10px);
-        border-radius: 15px;
-        padding: 15px 22px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        border-radius: 20px;
+        padding: 20px 25px;
+
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         border: 2px solid rgba(234, 59, 82, 0.3);
         font-family: var(--font-main);
         text-align: left;
-        min-width: 300px;
     }
 
     .user-info .welcome-text {
         color: #ea3b52;
-        margin-left: 10px;
-        font-size: 1.3rem;
+        font-size: 1.5rem;
         font-weight: 700;
-        margin-bottom: 8px;
+        margin-bottom: 5px;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        
+        white-space: normal;
+        word-wrap: break-word;
+        line-height: 1.2;
     }
 
     .user-info .details-text {
         color: #1A202C;
-        margin-left: 10px;
-        font-size: 1rem;
+        font-size: 1.0rem;
         font-weight: 500;
-        line-height: 1.4;
+        line-height: 1.5;
+        
+        white-space: normal;
+        word-wrap: break-word;
     }
 
     .user-info .highlight {
@@ -516,7 +537,7 @@
 
 
     /* =================================================================== */
-    /* == STYLES APPLIED FROM 55_ Screen Dimension Specifications.pdf == */
+    /* == STYLES APPLIED for 55_ Screen Dimension Specifications == */
     /* =================================================================== */
 
     @media screen and (min-width: 3800px) {
@@ -592,7 +613,7 @@
             font-size: 3.5 !important; 
         }
     }
-    
+
 </style>
 </head>
 <body>
@@ -603,14 +624,14 @@
         <form id="spinForm">
             <div class="form-group">
                 <label for="txtboxName" class="form-label">Name:</label>
-                <input type="text" id="txtboxName" name="txtboxName" class="form-input" required>
+                <input type="text" id="txtboxName" name="txtboxName" class="form-input" maxlength="15" required>
+                <div id="nameLimitMsg" class="limit-message">Maximum limit reached (15 characters)</div>
                 <div class="error-message" id="nameError">Please enter your name</div>
             </div>
 
             <div class="form-group">
                 <label for="txtReceiptNo" class="form-label">Receipt No.:</label>
-                <input type="text" id="txtReceiptNo" name="txtReceiptNo" class="form-input" 
-                       placeholder="e.g. 12345678" pattern="[0-9]+" required>
+                <input type="text" id="txtReceiptNo" name="txtReceiptNo" class="form-input" placeholder="e.g. 12345678" pattern="[0-9]+" required>
                 <div class="error-message" id="receiptError">Please enter a valid receipt number (numbers only)</div>
             </div>
 
@@ -649,7 +670,7 @@
             </svg>
         </div>
         
-        <h1 class="main-title">TITLE</h1>
+        <h1 class="main-title">Digital Spin and Wheel</h1>
 
         <div class="user-info" id="userInfo">
             <div class="welcome-text">Welcome, <span id="userName" class="highlight"></span></div>
@@ -665,7 +686,7 @@
     <script>
         
     /* ================================================== */
-    /* == SCRIPT LOGIC FROM landing_page.html (MODIFIED) == */
+    /* == SCRIPT LOGIC // landing page == */
     /* ================================================== */
     
     // This function loads saved data (e.g. on form refresh)
@@ -706,6 +727,22 @@
         const receiptInput = document.getElementById('txtReceiptNo');
         const branchSelect = document.getElementById('branchSelect');
         const spinButton = document.getElementById('readyToSpin');
+
+
+        // Name validation - limit to letters and spaces only
+        nameInput.addEventListener('input', function(e) {
+        // 1. Enforce letters and spaces only
+        this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+        // 2. Check if limit is reached
+        const limitMsg = document.getElementById('nameLimitMsg');
+        if (this.value.length >= 15) {
+        limitMsg.style.display = 'block'; // Show warning
+        this.style.borderColor = '#ea3b52'; // Optional: turn border red
+            } else {
+        limitMsg.style.display = 'none';  // Hide warning
+        this.style.borderColor = '#86BE4E'; // Reset border to green
+            }
+        });
 
         // Receipt number validation - only allow numbers
         receiptInput.addEventListener('input', function(e) {
@@ -829,7 +866,7 @@
 
 
     /* ========================================= */
-    /* == SCRIPT LOGIC FROM spin-wheel.html == */
+    /* == SCRIPT LOGIC // spin wheel == */
     /* ========================================= */
 
     // prize database
