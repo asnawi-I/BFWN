@@ -32,6 +32,58 @@
           align-items: center;
       }
 
+      /* ============================ */
+    /* == FULLSCREEN BUTTON STYLE == */
+    /* ============================ */
+
+    .fullscreen-btn {
+        position: fixed;
+        bottom: 30px; 
+        left: 30px;
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+        border: 3px solid #ea3b52; /* Theme Red Border */
+        border-radius: 50%; /* Circular button */
+        cursor: pointer;
+        z-index: 3000; /* Ensure it sits on top of everything */
+        padding: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy transition */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .fullscreen-btn:hover {
+        transform: scale(1.15) rotate(5deg);
+        box-shadow: 0 8px 25px rgba(234, 59, 82, 0.4); /* Red glow on hover */
+        background: #fff;
+    }
+
+    .fullscreen-btn:active {
+        transform: scale(0.95);
+    }
+
+    .fullscreen-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        pointer-events: none; /* Prevents image from interfering with clicks */
+    }
+
+    /* 4K Screen Support (Matches your existing 4K queries) */
+    @media screen and (min-width: 3800px) {
+        .fullscreen-btn {
+            bottom: 80px;
+            left: 80px;
+            width: 150px;
+            height: 150px;
+            border-width: 6px;
+            padding: 35px;
+        }
+    }
+
       /* ============================= */
       /* STYLES for landing page */
       /* ============================= */
@@ -682,6 +734,9 @@
 
     </div>
 
+    <button id="fullscreenBtn" class="fullscreen-btn" title="Toggle Fullscreen">
+        <img src="resize.png" alt="Fullscreen"> 
+    </button>
 
     <script>
         
@@ -1570,6 +1625,18 @@
             });
         }
     }
+
+    // ==========================================
+    // == FULLSCREEN BUTTON LOGIC ==
+    // ==========================================
+    
+    document.getElementById('fullscreenBtn').addEventListener('click', function() {
+        // Trigger the existing toggleFullscreen function you already have
+        toggleFullscreen();
+        
+        // Optional: Add a subtle click animation or sound here if desired
+        console.log('Fullscreen toggled via button');
+    });
 </script>
 </body>
 </html>
