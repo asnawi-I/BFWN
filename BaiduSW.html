@@ -521,8 +521,8 @@
         transform: none; 
         
         width: fit-content;
-        max-width: 450px;   /* Prevents box from hitting the wheel */
-        min-width: 300px;
+        max-width: 400px;   /* Prevents box from hitting the wheel */
+        min-width: 250px;
         
         z-index: 20;
         background: rgba(251, 252, 248, 0.95);
@@ -786,18 +786,28 @@
         const spinButton = document.getElementById('readyToSpin');
 
 
-        // Name validation - limit to letters and spaces only
+        // Name validation - limit to letters/spaces AND enforce 15 char limit
         nameInput.addEventListener('input', function(e) {
-        // 1. Enforce letters and spaces only
-        this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
-        // 2. Check if limit is reached
-        const limitMsg = document.getElementById('nameLimitMsg');
-        if (this.value.length >= 15) {
-        limitMsg.style.display = 'block'; // Show warning
-        this.style.borderColor = '#ea3b52'; // Optional: turn border red
+            // 1. Enforce letters and spaces only
+            let cleanedValue = this.value.replace(/[^a-zA-Z\s]/g, '');
+            
+            // 2. FORCE the hard stop at 15 characters
+            if (cleanedValue.length > 15) {
+                cleanedValue = cleanedValue.substring(0, 15);
+            }
+            
+            // 3. Update the input value with the cleaned, trimmed version
+            this.value = cleanedValue;
+
+            // 4. Handle the visual warning
+            const limitMsg = document.getElementById('nameLimitMsg');
+            
+            if (this.value.length === 15) {
+                limitMsg.style.display = 'block'; // Show warning at max
+                this.style.borderColor = '#ea3b52'; // Red border
             } else {
-        limitMsg.style.display = 'none';  // Hide warning
-        this.style.borderColor = '#86BE4E'; // Reset border to green
+                limitMsg.style.display = 'none';  // Hide warning
+                this.style.borderColor = '#86BE4E'; // Green border
             }
         });
 
