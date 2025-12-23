@@ -38,21 +38,22 @@
 
     .fullscreen-btn {
         position: fixed;
-        bottom: 30px; 
-        left: 30px;
-        width: 60px;
-        height: 60px;
+        bottom: 24px; 
+        left: 24px;
+        width: 42px;
+        height: 42px;
         background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
-        border: 3px solid #ea3b52; /* Theme Red Border */
+        border: 2px solid #ea3b52; /* Theme Red Border */
         border-radius: 50%; /* Circular button */
         cursor: pointer;
         z-index: 3000; /* Ensure it sits on top of everything */
-        padding: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        padding: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy transition */
         display: flex;
         justify-content: center;
         align-items: center;
+        opacity: 30%;
     }
 
     .fullscreen-btn:hover {
@@ -520,7 +521,7 @@
         
         width: fit-content;
         max-width: 300px;   /* Prevents box from hitting the wheel */
-        min-width: 450px;
+        min-width: 200px;
         
         z-index: 20;
         background: rgba(251, 252, 248, 0.95);
