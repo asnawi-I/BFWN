@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spin & Win - 3D Wheel</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            background-image: url('img/Background.png');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            overflow: hidden;
+            color: #1A202C;
+        }
+
+        .webgl {
+            position: fixed;
+            top: 0;
+            left: 0;
+            outline: none;
+        }
+
+        .main-title {
+            position: absolute;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            color: #ea3b52;
+            font-weight: bold;
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+
+        .spin-instruction {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: #1A202C;
+            text-align: center;
+            background: rgba(251, 252, 248, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            z-index: 10;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            color: #ea3b52;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="main-title"></h1>
+    <div class="loading" id="loading">Loading 3D Scene...</div>
+    <div class="spin-instruction" id="instruction" style="display: none;">
+        
+    </div>
+    
+    <canvas class="webgl"></canvas>
+
+    <script type="module">
+        import * as THREE from "https://esm.sh/three@0.174.0";
+        import { OrbitControls } from "https://esm.sh/three@0.174.0/addons/controls/OrbitControls.js";
+        import { GLTFLoader } from "https://esm.sh/three@0.174.0/examples/jsm/loaders/GLTFLoader.js";
+
+        const canvas = document.querySelector("canvas.webgl");
+        const scene = new THREE.Scene();
+        const sizes = { width: window.innerWidth, height: window.innerHeight };
+
+
+        const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 100);
+        camera.position.set(0, 2, 8);
+        scene.add(camera);
+
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+        renderer.setSize(sizes.width, sizes.height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+
+        const controls = new OrbitControls(camera, canvas);
+        controls.enableDamping = true;
+        controls.minDistance = 4;
+        controls.maxDistance = 12;
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(1, 1, 0);
+        scene.add(directionalLight);
+
+   
+        function createWheel() {
+            const wheelGroup = new THREE.Group();
+            
+            // Wheel base
+            const wheelGeometry = new THREE.CylinderGeometry(3, 3, 0.2, 32);
+            const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x86BE4E });
+            const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+            wheelGroup.add(wheel);
+
+            // Wheel segments (visual only for now)
+            const segmentColors = [0xEA3B52, 0x86BE4E, 0xFFCA06, 0x63CBD8];
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const segmentGeometry = new THREE.RingGeometry(1, 2.8, 0, Math.PI / 4);
+                const segmentMaterial = new THREE.MeshLambertMaterial({ 
+                    color: segmentColors[i % segmentColors.length],
+                    side: THREE.DoubleSide 
+                });
+                const segment = new THREE.Mesh(segmentGeometry, segmentMaterial);
+                segment.rotation.x = -Math.PI / 2;
+                segment.rotation.z = angle;
+                segment.position.y = 0.11;
+                wheelGroup.add(segment);
+            }
+
+            return wheelGroup;
+        }
+
+        // Create lever
+        function createLever() {
+            const leverGroup = new THREE.Group();
+            
+            const leverGeometry = new THREE.CylinderGeometry(0.1, 0.1, 2, 8);
+            const leverMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+            const lever = new THREE.Mesh(leverGeometry, leverMaterial);
+            lever.position.set(4, 0, 0);
+            lever.rotation.z = Math.PI / 6;
+            
+            leverGroup.add(lever);
+            return leverGroup;
+        }
+
+        // Initialize scene
+        const wheel = createWheel();
+        const lever = createLever();
+        scene.add(wheel);
+        scene.add(lever);
+
+        // Hide loading, show instruction
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('instruction').style.display = 'block';
+
+        // Mouse interaction variables
+        let isSpinning = false;
+        let spinSpeed = 0;
+        let spinDecay = 0.98;
+
+      
+        canvas.addEventListener('click', () => {
+            if (!isSpinning) {
+                isSpinning = true;
+                spinSpeed = 0.2;
+                console.log('Wheel spinning started');
+            }
+        });
+
+     
+        window.addEventListener('resize', () => {
+            sizes.width = window.innerWidth;
+            sizes.height = window.innerHeight;
+            camera.aspect = sizes.width / sizes.height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(sizes.width, sizes.height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        });
+
+  
+        function tick() {
+    
+            if (isSpinning) {
+                wheel.rotation.y += spinSpeed;
+                spinSpeed *= spinDecay;
+                
+                if (spinSpeed < 0.001) {
+                    isSpinning = false;
+                    spinSpeed = 0;
+                    
+     
+                    const rotation = wheel.rotation.y % (Math.PI * 2);
+                    const segmentIndex = Math.floor((rotation / (Math.PI * 2)) * 8);
+                    console.log('Wheel stopped at segment:', segmentIndex);
+                    
+              
+                }
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+            requestAnimationFrame(tick);
+        }
+
+        tick();
+    </script>
+</body>
+</html>
