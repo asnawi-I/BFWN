@@ -90,13 +90,46 @@
     /* 4K Screen Support */
     @media screen and (min-width: 3800px) {
         .fullscreen-btn {
-            bottom: 40px;
-            left: 40px;
-            width: 80px;
-            height: 80px;
-            border-width: 3px;
-            padding: 15px;
-        }
+        position: fixed;
+        bottom: 24px; 
+        left: 24px;
+        width: 42px;
+        height: 42px;
+        /* Default State: Red & White */
+        background: rgba(255, 255, 255, 0.9); 
+        border: 2px solid #ea3b52; 
+        border-radius: 50%; 
+        cursor: pointer;
+        z-index: 3000; 
+        padding: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0.3;
+    }
+
+        /* == GREEN STATE (Hovering or Active) == */
+    .fullscreen-btn:hover,
+    .fullscreen-btn.is-enlarged {
+        transform: scale(1.15) rotate(5deg);
+        /* Green Theme Background */
+        background: #86BE4E; 
+        border-color: #86BE4E;
+        /* Green Glow */
+        box-shadow: 0 8px 25px rgba(134, 190, 78, 0.6); 
+        opacity: 0.3;
+    }
+
+    /* Turn the black icon White when background is Green */
+    .fullscreen-btn:hover img,
+    .fullscreen-btn.is-enlarged img {
+        filter: brightness(0) invert(1);
+    }
+
+    .fullscreen-btn:active {
+        transform: scale(0.95);
     }
 
       /* ============================= */
