@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy First, Win Now!</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fredoka+One:wght@400&family=Alegreya+Sans+SC:wght@400;900&display=swap");
+        
+        :root {
+          --font-main: "Poppins", sans-serif;
+          --font-fun: "Poppins", cursive;
+          --color-bg: #FBFCF8;
+          --color-theme: #ea3b52;
+          --color-accent: #FFD700;
+      }
+
+      * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+      }
+
+      body {
+          background-image: url('img/Background.png');
+          height: 100vh;
+          color: var(--color-theme);
+          font-family: var(--font-main);
+          overflow: hidden;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+      }
+
+      /* ============================ */
+    /* == FULLSCREEN BUTTON STYLE == */
+    /* ============================ */
+
+    .fullscreen-btn {
+        position: fixed;
+        bottom: 24px; 
+        left: 24px;
+        width: 42px;
+        height: 42px;
+        background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+        border: 2px solid #ea3b52; /* Theme Red Border */
+        border-radius: 50%; /* Circular button */
+        cursor: pointer;
+        z-index: 3000; /* Ensure it sits on top of everything */
+        padding: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy transition */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 30%;
+    }
+
+    .fullscreen-btn:hover {
+        transform: scale(1.15) rotate(5deg);
+        box-shadow: 0 8px 25px rgba(234, 59, 82, 0.4); /* Red glow on hover */
+        background: #fff;
+    }
+
+    .fullscreen-btn:active {
+        transform: scale(0.95);
+    }
+
+    .fullscreen-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        pointer-events: none; /* Prevents image from interfering with clicks */
+    }
+
+    /* 4K Screen Support (Matches your existing 4K queries) */
+    @media screen and (min-width: 3800px) {
+        .fullscreen-btn {
+            bottom: 40px;
+            left: 40px;
+            width: 80px;
+            height: 80px;
+            border-width: 3px;
+            padding: 15px;
+            opacity: 20%;
+        }
+    }
+
+      /* ============================= */
+      /* STYLES for landing page */
+      /* ============================= */
+
+      .landing-container {
+            background: #FBFCF8;
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .landing-title {
+            color: #ea3b52;
+            font-size: 2.0rem;
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
+            font-weight: bolder;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            color: #1A202C;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #86BE4E;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1A202C;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FF4B33;
+            box-shadow: 0 0 10px rgba(255, 75, 51, 0.3);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #86BE4E;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1A202C;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #FF4B33;
+            box-shadow: 0 0 10px rgba(255, 75, 51, 0.3);
+        }
+
+        .landing-button {
+            width: 100%;
+            padding: 15px 30px;
+            background: #86BE4E;
+            color: #FBfCF8;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .landing-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .landing-button:active {
+            transform: translateY(0);
+        }
+
+        .landing-button:disabled {
+            background: #718096;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error-message {
+            color: #FF4B33;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .clear-btn {
+            width: 100%;
+            padding: 15px 30px;
+            background: #EA3B52;
+            color: #FBfCF8;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .clear-btn:hover {
+            transform: translateY(-2px);
+            box-shadow:0 6px 12px rgba(0, 0, 0, 0.4) ;
+        }
+
+        /*limit*/
+        .limit-message {
+            color: #ea3b52;       /* Red theme color */
+            font-size: 0.85rem;
+            margin-top: 5px;
+            font-weight: 500;
+            display: none;        /* Hidden by default */
+            font-style: italic;
+        }
+
+      /* ============================ */
+      /* STYLES for spin wheel */
+      /* ============================ */
+
+      #wheel-app-container {
+        display: none;
+        width: 100%;
+        height: 100%;
+      }
+
+      h1 {
+          position: absolute;
+          top: 3rem;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 4rem;
+          font-family: var(--font-fun);
+          text-shadow: none;
+          transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          z-index: 10;
+      }
+
+      h1.main-title {
+        font-size: 100px;
+        margin-top: -25px;
+        margin-bottom: auto;
+        color: #ea3b52;   
+        font-weight: bold;
+        text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+        white-space: nowrap;
+        z-index: 15;
+        letter-spacing: 2px;
+      }
+
+      .wheel-container {
+        position: absolute;
+        left: 50%;
+        bottom: -80%;
+        transform: translateX(-50%);
+        width: 150vmin;
+        height: 150vmin;
+        filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
+    }
+
+      .wheel-container::before {
+        content: '';
+        position: absolute;
+        top: 0px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        background: #ffca06;
+        border-radius: 80%;
+        z-index: -1;
+      }
+
+      svg#wheel {
+          width: 100%;
+          height: 100%;
+          filter: none;
+      }
+
+      svg#pin {
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%) rotate(90deg);
+          width: 6%;
+          height: 6%;
+          fill: #d81b2e;
+          filter: drop-shadow(0 4px 8px rgba(216, 27, 46, 0.4));
+          z-index: 5;
+      }
+
+      .spin-button {
+          position: absolute;
+          top: 510px;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 400px;
+          height: 400px;
+          border-radius: 50%;
+          box-shadow: 
+          0 12px 24px rgba(0,0,0,0.3),
+          0 6px 12px rgba(0,0,0,0.2),
+          inset 0 2px 4px rgba(255,255,255,0.9),
+          inset 0 -4px 8px rgba(0,0,0,0.2);
+          z-index: 1000;
+          background: 
+          radial-gradient(ellipse at 30% 30%, #ffffff 0%, #f8f8f8 50%, #e8e8e8 100%);
+          cursor: pointer;
+          font-family: var(--font-fun);
+          border: 15px solid #d0d0d0;
+          outline: none;
+          font-size: 70px;
+          font-weight: 600;
+          color: #666;
+          display: flex;
+          align-items: flex-start;
+          padding-top: 70px;
+          justify-content: center;
+          -webkit-user-select: none; 
+          -moz-user-select: none;    
+          -ms-user-select: none;     
+          user-select: none;
+      }
+
+      .spin-button:active {
+          transform: translate(-50%, -50%) translateY(6px);
+          box-shadow: 
+          0 2px 4px rgba(0,0,0,0.5),
+          0 1px 2px rgba(0,0,0,0.4),
+          inset 0 4px 8px rgba(0,0,0,0.4),
+          inset 0 -2px 4px rgba(255,255,255,0.3);
+          background: 
+          radial-gradient(ellipse at 70% 70%, #d8d8d8 0%, #c8c8c8 50%, #b8b8b8 100%);
+          border: 15px solid #b8b8b8;
+          text-shadow: 
+          0 1px 0 rgba(255,255,255,0.9),
+          0 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .spin-button.isSpinning {
+          cursor: not-allowed;
+          background: #F7FAFC;
+          color: #CBD5E0;
+      }
+
+      @keyframes buttonSpin {
+          0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+          25% { transform: translate(-50%, -50%) rotate(5deg); }
+          75% { transform: translate(-50%, -50%) rotate(-5deg); }
+      }
+
+      @keyframes pinWheel {
+          0%, 100% { transform: translateX(-50%) rotate(90deg); }
+          25% { transform: translateX(-50%) rotate(75deg); }
+          75% { transform: translateX(-50%) rotate(105deg); }
+      }
+
+      /*popup modal*/
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center; 
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .popup-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .popup-content {
+        background: white;
+        border: 4px solid #4CAF50;
+        border-radius: 15px;
+        text-align: center;
+        max-width: 420px;
+        width: 90%;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transform: scale(0.7);
+        transition: transform 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .popup-header {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #333;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .popup-body {
+        padding: 2rem;
+        background: #f1f8e9;
+    }
+
+    .popup-message {
+        color: #666;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .popup-description {
+        color: #666;
+        font-size: 0.95rem;
+        margin-top: 1rem;
+    }
+
+    .popup-buttons {
+        padding: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .popup-btn {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .popup-btn.secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .popup-btn.secondary:hover {
+        background: #5a6268;
+    }
+
+      .popup-overlay.show .popup-content {
+        transform: scale(1.0);
+      }
+
+      .popup-title {
+        color: var(--color-theme);
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        font-family: var(--font-fun);
+      }
+
+      .popup-prize {
+        color: #333;
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 1rem 0;
+        font-family: var(--font-fun);
+      }
+
+      .popup-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: none;
+        border: none;
+        font-size: 2rem;
+        cursor: pointer;
+        color: #666;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .popup-close:hover {
+        color: var(--color-theme);
+      }
+
+      #confetti-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1500;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+
+      #confetti-canvas.active {
+        opacity: 1;
+      }
+
+      /*user info display */
+      .user-info {
+        position: absolute;
+        top: 175px;
+        
+        left: -12px; 
+        transform: none; 
+        
+        width: fit-content;
+        max-width: 400px;   /* Prevents box from hitting the wheel */
+        min-width: 250px;
+        
+        z-index: 20;
+        background: rgba(251, 252, 248, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 20px 25px;
+
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        border: 2px solid rgba(234, 59, 82, 0.3);
+        font-family: var(--font-main);
+        text-align: left;
+    }
+
+    .user-info .welcome-text {
+        color: #ea3b52;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        
+        white-space: normal;
+        word-wrap: break-word;
+        line-height: 1.2;
+    }
+
+    .user-info .details-text {
+        color: #1A202C;
+        font-size: 1.0rem;
+        font-weight: 500;
+        line-height: 1.5;
+        
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .user-info .highlight {
+        color: #86BE4E;
+        font-weight: 600;
+    }
+
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+          .wheel-container {
+            width: 95vmin;
+            height: 95vmin;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .landing-button {
+            padding: 1.2rem 2.4rem;
+            font-size: 1.6rem;
+        }
+
+        .landing-container {
+            padding: 30px 20px;
+        }
+        
+        .landing-title {
+            font-size: 2rem;
+        }
+    }
+
+
+    /* =================================================================== */
+    /* == STYLES APPLIED for 55_ Screen Dimension Specifications == */
+    /* =================================================================== */
+
+    @media screen and (min-width: 3800px) {
+        
+        /* Main Title */
+        h1.main-title {
+            font-size: 220px; 
+            top: 75px; 
+            margin-top: 0;
+            letter-spacing: 5px; 
+            text-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4); 
+        }
+
+        /* Wheel Container */
+        .wheel-container {
+            width: 2500px; 
+            height: 2500px; 
+            bottom: -40%; 
+            filter: drop-shadow(0 40px 80px rgba(0, 0, 0, 0.6)); 
+        }
+
+        .wheel-container::before {
+            border-radius: 80%; 
+        }
+        
+        /* Spin Button */
+        .spin-button {
+            width: 650px; 
+            height: 650px; 
+            font-size: 150px; 
+            border-width: 30px; 
+            padding-top: 120px; 
+            box-shadow: 
+                0 24px 48px rgba(0,0,0,0.3), 
+                0 12px 24px rgba(0,0,0,0.2),
+                inset 0 4px 8px rgba(255,255,255,0.9),
+                inset 0 -8px 16px rgba(0,0,0,0.2);
+        }
+
+        /* Pin */
+        svg#pin {
+            width: 6%; 
+            height: 6%; 
+        }
+        
+        /* User Info Box */
+        .user-info {
+            top: 300px; 
+            left: 180px; 
+            transform: none; 
+            min-width: 480px; 
+            padding: 30px; 
+            border-radius: 25px; 
+            backdrop-filter: blur(10px); 
+        }
+
+        .user-info .welcome-text {
+            font-size: 30px; 
+        }
+
+        .user-info .details-text {
+            font-size: 20px; 
+        }
+        
+        /* Popup Modal */
+        .popup-content {
+            transform: scale(2.5) !important;
+            margin-top: 200px; 
+        }
+        
+        /* Custom adjustment for wheel prize text */
+        .prize-text {
+            font-size: 3.5 !important; 
+        }
+    }
+
+</style>
+</head>
+<body>
+
+    <div class="landing-container" id="landing-container">
+        <h1 class="landing-title"></h1>
+        
+        <form id="spinForm">
+            <div class="form-group">
+                <label for="txtboxName" class="form-label">Name:</label>
+                <input type="text" id="txtboxName" name="txtboxName" class="form-input" maxlength="15" required>
+                <div id="nameLimitMsg" class="limit-message">Maximum limit reached (15 characters)</div>
+                <div class="error-message" id="nameError">Please enter your name</div>
+            </div>
+
+            <div class="form-group">
+                <label for="txtReceiptNo" class="form-label">Receipt No.:</label>
+                <input type="text" id="txtReceiptNo" name="txtReceiptNo" class="form-input" placeholder="e.g. 12345678" pattern="[0-9]+" required>
+                <div class="error-message" id="receiptError">Please enter a valid receipt number (numbers only)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="branchSelect" class="form-label">Select branch:</label>
+                <select id="branchSelect" name="branchSelect" class="form-select" required>
+                    <option value="">Select Branch</option>
+                    <option value="batu-satu">Batu Satu Branch</option>
+                    <option value="madang">Madang Branch</option>
+                </select>
+                <div class="error-message" id="branchError">Please select a branch</div>
+            </div>
+
+            <button type="button" id="readyToSpin" class="landing-button">
+                Ready to Spin
+            </button>
+            <button type="button" id="clearForm" class="clear-btn">CLEAR</button>
+        </form>
+    </div>
+
+    <div id="wheel-app-container">
+        <canvas id="confetti-canvas"></canvas>
+        
+        <div class="wheel-container">
+            <svg id="wheel" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="48" fill="none" stroke-width="1" stroke="currentColor" opacity="0.3"/>
+                <circle id="slice" cx="50" cy="50" r="47" fill="#001C34" />
+                <g id="slices"></g>
+            </svg>
+            
+            <button class="spin-button">SPIN!</button>
+            
+            <svg id="pin" viewBox="0 0 50 50">
+                <path d="M 45 25 L 5 10 L 5 40 Z" />
+                <circle cx="5" cy="25" r="3" fill="currentColor"/>
+            </svg>
+        </div>
+        
+        <h1 class="main-title">Digital Spin and Wheel</h1>
+
+        <div class="user-info" id="userInfo">
+            <div class="welcome-text">Welcome, <span id="userName" class="highlight"></span></div>
+            <div class="details-text">
+                Receipt: <span id="userReceipt" class="highlight"></span> | 
+                Branch: <span id="userBranch" class="highlight"></span>
+            </div>
+        </div>
+
+    </div>
+
+    <button id="fullscreenBtn" class="fullscreen-btn" title="Toggle Fullscreen">
+        <img src="resize.png" alt="Fullscreen"> 
+    </button>
+
+    <script>
+        
+    /* ================================================== */
+    /* == SCRIPT LOGIC // landing page == */
+    /* ================================================== */
+    
+    // This function loads saved data (e.g. on form refresh)
+    function loadLandingFormData() {
+        const savedData = sessionStorage.getItem('userFormData');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            document.getElementById('txtboxName').value = data.name || '';
+            document.getElementById('txtReceiptNo').value = data.receiptNo || '';
+            document.getElementById('branchSelect').value = data.branch || '';
+        }
+    }
+
+    // clear function
+    document.getElementById('clearForm').addEventListener('click', function() {
+        //clear
+        document.getElementById('txtboxName').value = '';
+        document.getElementById('txtReceiptNo').value = '';
+        document.getElementById('branchSelect').value = '';
+    
+        sessionStorage.removeItem('userFormData');
+
+        //reset 
+        document.getElementById('txtboxName').style.borderColor = '#86BE4E';
+        document.getElementById('txtReceiptNo').style.borderColor = '#86BE4E';
+        document.getElementById('branchSelect').style.borderColor = '#86BE4E';
+
+        //hide error
+        document.getElementById('nameError').style.display = 'none';
+        document.getElementById('receiptError').style.display = 'none';
+        document.getElementById('branchError').style.display = 'none';
+    });
+
+    // Setup form validation and submission
+    function setupLandingForm() {
+        const form = document.getElementById('spinForm');
+        const nameInput = document.getElementById('txtboxName');
+        const receiptInput = document.getElementById('txtReceiptNo');
+        const branchSelect = document.getElementById('branchSelect');
+        const spinButton = document.getElementById('readyToSpin');
+
+
+        // Name validation - limit to letters/spaces AND enforce 15 char limit
+        nameInput.addEventListener('input', function(e) {
+            // 1. Enforce letters and spaces only
+            let cleanedValue = this.value.replace(/[^a-zA-Z\s]/g, '');
+            
+            // 2. FORCE the hard stop at 15 characters
+            if (cleanedValue.length > 15) {
+                cleanedValue = cleanedValue.substring(0, 15);
+            }
+            
+            // 3. Update the input value with the cleaned, trimmed version
+            this.value = cleanedValue;
+
+            // 4. Handle the visual warning
+            const limitMsg = document.getElementById('nameLimitMsg');
+            
+            if (this.value.length === 15) {
+                limitMsg.style.display = 'block'; // Show warning at max
+                this.style.borderColor = '#ea3b52'; // Red border
+            } else {
+                limitMsg.style.display = 'none';  // Hide warning
+                this.style.borderColor = '#86BE4E'; // Green border
+            }
+        });
+
+        // Receipt number validation - only allow numbers
+        receiptInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Real-time validation
+        function validateField(field, errorElement, validationFn) {
+            field.addEventListener('blur', function() {
+                if (validationFn()) {
+                    field.style.borderColor = '#86BE4E';
+                    errorElement.style.display = 'none';
+                } else {
+                    field.style.borderColor = '#FF4B33';
+                    errorElement.style.display = 'block';
+                }
+            });
+        }
+
+        // Validation functions
+        validateField(nameInput, document.getElementById('nameError'), 
+            () => nameInput.value.trim().length > 0);
+        
+        validateField(receiptInput, document.getElementById('receiptError'), 
+            () => /^[0-9]+$/.test(receiptInput.value) && receiptInput.value.length > 0);
+        
+        validateField(branchSelect, document.getElementById('branchError'), 
+            () => branchSelect.value !== '');
+
+        // Form submission
+        spinButton.addEventListener('click', function() {
+            let isValid = true;
+            
+            // Validate all fields
+            if (nameInput.value.trim() === '') {
+                nameInput.style.borderColor = '#FF4B33';
+                document.getElementById('nameError').style.display = 'block';
+                isValid = false;
+            } else {
+                nameInput.style.borderColor = '#86BE4E';
+                document.getElementById('nameError').style.display = 'none';
+            }
+
+            if (!/^[0-9]+$/.test(receiptInput.value) || receiptInput.value.length === 0) {
+                receiptInput.style.borderColor = '#FF4B33';
+                document.getElementById('receiptError').style.display = 'block';
+                isValid = false;
+            } else {
+                receiptInput.style.borderColor = '#86BE4E';
+                document.getElementById('receiptError').style.display = 'none';
+            }
+
+            if (branchSelect.value === '') {
+                branchSelect.style.borderColor = '#FF4B33';
+                document.getElementById('branchError').style.display = 'block';
+                isValid = false;
+            } else {
+                branchSelect.style.borderColor = '#86BE4E';
+                document.getElementById('branchError').style.display = 'none';
+            }
+
+            if (isValid) {
+                // Store form data
+                const formData = {
+                    name: nameInput.value.trim(),
+                    receiptNo: receiptInput.value,
+                    branch: branchSelect.value
+                };
+                
+                console.log('Form Data:', formData);
+                sessionStorage.setItem('userFormData', JSON.stringify(formData));
+
+                // === MODIFIED FOR MERGED FILE ===
+                // Hide landing page, show wheel
+                document.getElementById('landing-container').style.display = 'none';
+                document.getElementById('wheel-app-container').style.display = 'block';
+
+                // Manually trigger the user data loading and wheel generation
+                loadUserDataAndGenerateWheel(); 
+                // === END MODIFICATION ===
+
+            } else {
+                // Shake effect for invalid form
+                spinButton.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    spinButton.style.animation = '';
+                }, 500);
+            }
+        });
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 20%, 40%, 60%, 80% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Fullscreen functionality for landing page title
+    let landingTitleClickCount = 0;
+    let landingTitleClickTimer = null;
+
+    document.querySelector('h1.landing-title').addEventListener('click', function() {
+        landingTitleClickCount++;
+        
+        if (landingTitleClickCount === 1) {
+            landingTitleClickTimer = setTimeout(() => {
+                landingTitleClickCount = 0; 
+            }, 1000); 
+        }
+        
+        if (landingTitleClickCount === 3) {
+            clearTimeout(landingTitleClickTimer);
+            landingTitleClickCount = 0;
+            toggleFullscreen();
+        }
+    });
+
+
+    /* ========================================= */
+    /* == SCRIPT LOGIC // spin wheel == */
+    /* ========================================= */
+
+    // prize database
+    const PRIZE_DATABASE = {
+        branches: {
+            'batu-satu': {
+                id: 1,
+                name: 'Batu Satu Branch',
+                prizes: [
+                    // Gold Prizes
+                    { id: 'B2', name: 'Gold Prize B2', category: 'gold', quantity: 1, probability: 5, available: true },
+                    { id: 'B3', name: 'Gold Prize B3', category: 'gold', quantity: 1, probability: 5, available: true },
+                    
+                    // Silver Prizes 
+                    { id: 'B1', name: 'Silver Prize B1', category: 'silver', quantity: 1, probability: 15, available: true },
+                    { id: 'B4', name: 'Silver Prize B4', category: 'silver', quantity: 1, probability: 15, available: true },
+                    
+                    // Complimentary Gifts
+                    { id: 'COMP1', name: 'Complimentary Gift 1', category: 'complimentary', quantity: 50, probability: 25, available: true },
+                    { id: 'COMP2', name: 'Complimentary Gift 2', category: 'complimentary', quantity: 50, probability: 30, available: true }
+
+                ]
+            },
+
+            'madang': {
+                id: 2,
+                name: 'Madang Branch',
+                prizes: [
+                    // Gold Prizes
+                    { id: 'M2', name: 'Gold Prize M1', category: 'gold', quantity: 1, probability: 5, available: true },
+                    { id: 'M3', name: 'Gold Prize M4', category: 'gold', quantity: 1, probability: 5, available: true },
+                    
+                    // Silver Prizes 
+                    { id: 'M1', name: 'Silver Prize M2', category: 'silver', quantity: 1, probability: 15, available: true },
+                    { id: 'M4', name: 'Silver Prize M3', category: 'silver', quantity: 1, probability: 15, available: true },
+                    
+                    // Complimentary Gifts
+                    { id: 'COMP3', name: 'Complimentary Gift 3', category: 'complimentary', quantity: 50, probability: 25, available: true },
+                    { id: 'COMP4', name: 'Complimentary Gift 4', category: 'complimentary', quantity: 50, probability: 30, available: true }
+
+                ]
+            }
+        },
+
+        //track winner
+        winners: [],
+
+        //get available prizes for a branch
+        getAvailablePrizes: function(branchKey) {
+            if (!this.branches[branchKey]) return [];
+            
+            const prizes = this.branches[branchKey].prizes.filter(prize => prize.quantity > 0 && prize.available);
+            
+            // Check if probabilities total to 100%
+            const total = prizes.reduce((sum, prize) => sum + prize.probability, 0);
+            if (Math.abs(total - 100) > 0.1) {
+                console.warn('Prize probabilities do not total 100%. Weighted system may be unstable.');
+            }
+            
+            return prizes;
+        },
+
+        //weighted prize pool
+        createWeightedPool: function(branchKey) {
+            const availablePrizes = this.getAvailablePrizes(branchKey);
+            let weightedPool = [];
+            
+            // Calculate current total
+            const currentTotal = availablePrizes.reduce((sum, prize) => sum + prize.probability, 0);
+            
+            // Only fix tiny floating point errors, preserve admin intentions
+            let finalPrizes = availablePrizes;
+            if (Math.abs(currentTotal - 100) < 0.01) {
+                // Tiny floating point error (99.999999 vs 100) 
+                const adjustment = (100 - currentTotal) / availablePrizes.length;
+                finalPrizes = availablePrizes.map(prize => ({
+                    ...prize,
+                    probability: prize.probability + adjustment
+                }));
+                console.log('Applied micro-adjustment for floating point precision');
+            } else {
+                // Use admin values as-is, even if total ≠ 100%
+                console.log('Using admin probabilities as-is. Total:', currentTotal + '%');
+            }
+            
+            finalPrizes.forEach(prize => {
+                const entries = Math.round(prize.probability);
+                for (let i = 0; i < entries; i++) {
+                    weightedPool.push(prize);
+                }
+            });
+            
+            return weightedPool;
+        },
+
+        //prize quantity management
+        winPrize: function(prizeId, branchKey, customerName, receiptNo) {
+            const branch = this.branches[branchKey];
+            if (!branch) return false;
+
+            const prize = branch.prizes.find(p => p.id === prizeId);
+            if (!prize || prize.quantity <= 0) return false; 
+
+            // Decrease quantity
+            prize.quantity--;
+            if (prize.quantity === 0) {
+                prize.available = false;
+            }
+
+            // Record winner
+            this.winners.push({
+                customerName: customerName,
+                prize: prize.name,
+                prizeId: prizeId,
+                branch: branch.name,
+                branchId: branchKey,
+                receiptNo: receiptNo,
+                timestamp: new Date().toISOString()
+            });
+            
+            currentBranchPrizes = this.getAvailablePrizes(branchKey);
+            return true;
+        }
+    };
+
+    function loadFromLocalStorage() {
+        const saved = localStorage.getItem('PRIZE_DATABASE');
+        if (saved) {
+            const savedData = JSON.parse(saved);
+            Object.assign(PRIZE_DATABASE, savedData);
+            console.log('spin wheel loaded exist winners:', PRIZE_DATABASE.winners);
+        }
+    }
+
+    loadFromLocalStorage();
+
+    // store current branch data
+    let currentBranchPrizes = [];
+    let currentBranchKey = '';
+
+    // This function is now called by the landing page script
+    function loadUserDataAndGenerateWheel() {
+        const userData = sessionStorage.getItem('userFormData');
+        if (userData) {
+            const data = JSON.parse(userData);
+            document.getElementById('userName').textContent = data.name;
+            document.getElementById('userReceipt').textContent = data.receiptNo;
+            document.getElementById('userBranch').textContent = data.branch;
+
+
+            currentBranchKey = data.branch;
+            console.log('LOADED BRANCH:', currentBranchKey);
+            console.log('USER DATA:', data);
+            currentBranchPrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
+
+            generateWheelFromPrizes();
+            // Removed ticker update
+
+            console.log('Loaded prizes for', currentBranchKey, ':', currentBranchPrizes);
+        } else {
+            // If no data, show the landing page (which is the default state)
+            document.getElementById('landing-container').style.display = 'block';
+            document.getElementById('wheel-app-container').style.display = 'none';
+        }
+    }
+    
+    // Main DOMContentLoaded listener for the whole merged page
+    document.addEventListener('DOMContentLoaded', function() {
+        // This logic handles refreshing the page *after* submitting the form
+        const userData = sessionStorage.getItem('userFormData');
+        if (userData) {
+            // User data exists, so show the wheel and hide the form
+            document.getElementById('landing-container').style.display = 'none';
+            document.getElementById('wheel-app-container').style.display = 'block';
+            loadUserDataAndGenerateWheel(); // Load the data into the wheel
+        } else {
+            // No user data, so show the form (default state) and load any saved form fields
+            loadLandingFormData();
+        }
+        
+        // Setup the landing page form listeners
+        setupLandingForm();
+    });
+
+
+    // swipe listeners to the wheel container
+    const wheelContainer = document.querySelector('.wheel-container');
+    wheelContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+    wheelContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    setInterval(() => {
+        // Only run inventory update if the wheel is visible
+        if (document.getElementById('wheel-app-container').style.display === 'block') {
+            updateInventoryDisplay();
+        }
+    }, 5000);
+
+
+    document.body.insertAdjacentHTML('beforeend', `
+    <div class="popup-overlay" id="prizePopup">
+        <div class="popup-content">
+            <div class="popup-header">  Congratulations! </div>
+            <div class="popup-body">
+                <div class="popup-message">You have won:</div>
+                <div class="popup-prize" id="popupPrizeText">Prize 1</div>
+            </div>
+            <div class="popup-buttons">
+                <button class="popup-btn secondary" onclick="closePrizePopup()">Close</button>
+            </div>
+        </div>
+    </div>
+`);
+
+    function showPrizePopup(prize) {
+        document.getElementById('popupPrizeText').textContent = prize;
+        document.getElementById('prizePopup').classList.add('show');
+            startConfetti();
+    }
+
+
+    function closePrizePopup() {
+        document.getElementById('prizePopup').classList.remove('show');
+
+        // Reset to landing page
+        setTimeout(() => {
+            sessionStorage.removeItem('userFormData');
+            // Show landing, hide wheel
+            document.getElementById('landing-container').style.display = 'block';
+            document.getElementById('wheel-app-container').style.display = 'none';
+            // Clear the form fields for the next user
+            document.getElementById('txtboxName').value = '';
+            document.getElementById('txtReceiptNo').value = '';
+            document.getElementById('branchSelect').value = '';
+            // Reset wheel transform for next spin
+            if(containerSlices) {
+                containerSlices.style.transition = 'none';
+                containerSlices.style.transform = 'rotate(0deg)';
+            }
+        }, 300);
+    }
+
+    const containerSlices = document.querySelector('g#slices');
+    const pin = document.querySelector('svg#pin');
+    const heading = document.querySelector('h1.main-title'); // Made specific
+    const spinButton = document.querySelector('.spin-button');
+
+    let timeoutID = 0;
+    let isSpinning = false;
+
+    const randomInt = (min = 0, max = 16) => Math.floor(Math.random() * (max - min) + min);
+    const randomHex = () => randomInt().toString(16);
+
+    function generateWheelFromPrizes() {
+        containerSlices.innerHTML = '';
+        document.querySelector('svg circle#slice').style.display = 'none';
+        
+        const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
+        if (availablePrizes.length === 0) {
+            alert('All prizes have been claimed!');
+            return;
+        }
+        
+        // Use actual prize names instead of categories
+        const prizeNames = availablePrizes.map(p => p.name);
+        const colors = ['#EA3B52', '#86BE4E', '#FFCA06', '#63CBD8', '#FF4B33', '#63CBD8', '#D81B2E', '#86BE4E'];
+        
+        // Generate wheel segments
+        for (let i = 0; i < 8; i++) {
+            const startAngle = (i * 45 - 22.5) * Math.PI / 180;
+            const endAngle = ((i + 1) * 45 - 22.5) * Math.PI / 180;
+
+            const x1 = 50 + Math.cos(startAngle) * 46;
+            const y1 = 50 + Math.sin(startAngle) * 46;
+            const x2 = 50 + Math.cos(endAngle) * 46;
+            const y2 = 50 + Math.sin(endAngle) * 46;
+
+            const path = `
+                <path d="M 50 50 L ${x1} ${y1} A 46 46 0 0 1 ${x2} ${y2} Z" 
+                    fill="${colors[i]}" 
+                    stroke="white" 
+                    stroke-width="0.5"/>
+            `;
+            containerSlices.innerHTML += path;
+
+            const midAngle = (i * 45) * Math.PI / 180;
+            const textX = 50 + Math.cos(midAngle) * 32; 
+            const textY = 50 + Math.sin(midAngle) * 32;
+            
+            // Cycle through actual prize names
+            const prizeText = prizeNames[i % prizeNames.length];
+            
+            const textElement = `
+                <text x="${textX}" y="${textY}" 
+                    text-anchor="middle" 
+                    dominant-baseline="middle"
+                    fill="white" 
+                    font-size="2.2" 
+                    font-weight="bold"
+                    font-family="Poppins"
+                    stroke="#000"
+                    stroke-width="0.1"
+                    class="prize-text">${prizeText}</text>
+            `;
+            containerSlices.innerHTML += textElement;
+        }
+    }
+
+
+    let textUpdateInterval;
+
+    function startPrizeAnimation() { 
+        const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
+        const allPrizeNames = availablePrizes.map(prize => prize.name);
+        
+        textUpdateInterval = setInterval(() => {
+            const textElements = containerSlices.querySelectorAll('.prize-text');
+            textElements.forEach(textEl => {
+                const randomPrize = allPrizeNames[Math.floor(Math.random() * allPrizeNames.length)];
+                textEl.textContent = randomPrize;
+            });
+        }, 50); 
+    }
+
+    function stopPrizeAnimation() {
+        if (textUpdateInterval) {
+            clearInterval(textUpdateInterval);
+        }
+    }
+
+    function spinWheel() {
+        if (isSpinning) return;
+
+        if (!updateInventoryDisplay()) {
+            alert('All prizes have been claimed! Thank you for playing!');
+            return;
+        }
+
+        isSpinning = true;
+        startPrizeAnimation();
+
+        [spinButton, pin].forEach(el => {
+            el.removeEventListener('click', spinWheel);
+            el.classList.add('isSpinning');
+        });
+
+        const randomDuration = 4;
+        
+        // STEP 1: Select prize using probability FIRST
+        const weightedPool = PRIZE_DATABASE.createWeightedPool(currentBranchKey);
+        if (weightedPool.length === 0) {
+            alert('All prizes have been claimed!');
+            [spinButton, pin].forEach(el => {
+                el.classList.remove('isSpinning');
+                el.addEventListener('click', spinWheel);
+            });
+            isSpinning = false;
+            return;
+        }
+        
+        const randomIndex = Math.floor(Math.random() * weightedPool.length);
+        const selectedPrize = weightedPool[randomIndex];
+        
+        // STEP 2: Determine target segment and place selected prize there
+        const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
+        const prizeNames = availablePrizes.map(p => p.name);
+        const prizeIndex = prizeNames.indexOf(selectedPrize.name);
+        const targetSegment = prizeIndex % 8;
+
+        // Ensure the selected prize is placed at the target segment
+        const textElements = containerSlices.querySelectorAll('.prize-text');
+        textElements[targetSegment].textContent = selectedPrize.name;
+
+        // Pin points to segment 6, so we need to rotate to bring target segment to segment 6 position
+        const segmentOffset = 6; // Pin points to segment 6
+        const rotationNeeded = (segmentOffset - targetSegment) * 45;
+        const spins = 3600; // Multiple full rotations for animation
+        const finalRotation = spins + rotationNeeded;
+
+        console.log('Selected prize:', selectedPrize.name, 'Target segment:', targetSegment, 'Rotation needed:', rotationNeeded);
+
+        // STEP 3: Spin to the calculated position
+        setTimeout(() => {
+            containerSlices.style.transformOrigin = '50%';
+            containerSlices.style.transition = `transform ${randomDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+            containerSlices.style.transform = `rotate(${finalRotation}deg)`;
+        }, 50);
+
+        pin.style.animation = `pinWheel ${randomDuration / 8}s infinite ease-in-out`;
+
+        // Color animation
+        const animationStartTime = Date.now();
+        const startRotation = 0;
+        const endRotation = finalRotation
+        const colors = ['#EA3B52', '#86BE4E', '#FFCA06', '#63CBD8', '#FF4B33', '#63CBD8', '#D81B2E', '#86BE4E'];
+
+        const colorInterval = setInterval(() => {
+            const elapsed = Date.now() - animationStartTime;
+            const progress = Math.min(elapsed / (randomDuration * 1000), 1);
+            
+            const easedProgress = progress < 0.5 
+                ? 2 * progress * progress 
+                : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+            
+            const currentRotation = startRotation + (endRotation - startRotation) * easedProgress;
+            const normalizedRotation = (360 - (currentRotation % 360) + 22.5) % 360;
+            const sliceIndex = (Math.floor(normalizedRotation / 45) + 6) % 8;
+            const sliceColor = colors[sliceIndex];
+            
+            document.documentElement.style.setProperty('--color-theme', sliceColor);
+            
+            if (progress >= 1) {
+                clearInterval(colorInterval);
+            }
+        }, 50);
+
+        // Stop animation and fix text rotation
+        setTimeout(() => {
+            stopPrizeAnimation();
+
+            const textElements = containerSlices.querySelectorAll('.prize-text');
+            textElements[targetSegment].textContent = selectedPrize.name;
+            
+            const transformStyle = containerSlices.style.transform;
+            const rotationMatch = transformStyle.match(/rotate\(([^)]+)deg\)/);
+            const currentRotation = rotationMatch ? parseFloat(rotationMatch[1]) : 0;
+            
+            textElements.forEach((textEl) => {
+                const x = parseFloat(textEl.getAttribute('x'));
+                const y = parseFloat(textEl.getAttribute('y'));
+                textEl.setAttribute('transform', `rotate(${-currentRotation}, ${x}, ${y})`);
+            });
+        }, randomDuration * 1000 * 0.3);
+
+
+        // Final win processing
+        timeoutID = setTimeout(() => {
+            pin.style.animation = '';
+            
+            const userData = JSON.parse(sessionStorage.getItem('userFormData'));
+            const customerName = userData.name;
+            
+            const success = PRIZE_DATABASE.winPrize(selectedPrize.id, currentBranchKey, customerName, userData.receiptNo);
+            
+            if (success) {
+                console.log('WINNER ADDED:', PRIZE_DATABASE.winners);
+                saveToLocalStorage();
+                backupToConsole();
+                // Removed ticker update on win
+
+                
+                setTimeout(() => {
+                    showPrizePopup(selectedPrize.name);
+                }, 1000);
+            } else {
+                alert('Prize selection failed. Please try again.');
+            }
+
+            [spinButton, pin].forEach(el => {
+                el.classList.remove('isSpinning');
+                el.addEventListener('click', spinWheel);
+            });
+
+            isSpinning = false;
+            clearTimeout(timeoutID);
+        }, randomDuration * 1000);
+    }
+
+    [spinButton, pin].forEach(el => {
+        el.addEventListener('click', spinWheel);
+    });
+
+    document.addEventListener('keydown', (e) => {
+        // Only allow spacebar spin if the wheel is visible
+        if (document.getElementById('wheel-app-container').style.display === 'block') {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                spinWheel();
+            }
+        }
+    });
+
+
+    //save to local storage after winninng
+    function saveToLocalStorage() {
+        localStorage.setItem('PRIZE_DATABASE', JSON.stringify(PRIZE_DATABASE));
+        console.log('SAVED TO LOCALSTORAGE:', PRIZE_DATABASE.winners);
+        
+        // Trigger storage event for other tabs/windows
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: 'PRIZE_DATABASE',
+            newValue: JSON.stringify(PRIZE_DATABASE)
+        }));
+    }
+
+    function backupToConsole() {
+        console.log('CURRENT DATABASE BACKUP:', JSON.stringify(PRIZE_DATABASE, null, 2));
+    }
+
+
+    //show current inventory status
+    function updateInventoryDisplay() {
+        const availablePrizes = PRIZE_DATABASE.getAvailablePrizes(currentBranchKey);
+        
+        // Count prizes by category
+        const inventory = {
+            gold: availablePrizes.filter(p => p.category === 'gold').reduce((sum, p) => sum + p.quantity, 0),
+            silver: availablePrizes.filter(p => p.category === 'silver').reduce((sum, p) => sum + p.quantity, 0),
+            complimentary: availablePrizes.filter(p => p.category === 'complimentary').reduce((sum, p) => sum + p.quantity, 0)
+        };
+        
+        
+        // If all prizes are gone, disable spinning
+        if (availablePrizes.length === 0) {
+            spinButton.disabled = true;
+            spinButton.textContent = 'NO PRIZES LEFT';
+            spinButton.style.background = '#gray';
+            return false;
+        }
+        
+        return true;
+    }
+
+
+    // --- CONFETTI SYSTEM 4K OPTIMIZED ---
+
+    // 1. Detect if we are on a large screen (4K width is usually 3840px)
+    // We create a scale factor: 1 for laptops, ~2.5 for 4K screens
+    const scaleFactor = Math.min(Math.max(window.innerWidth / 1500, 1), 3);
+
+    // 2. Increase particle count for 4K resolution
+    const NUM_CONFETTI = Math.floor(350 * (scaleFactor > 1.5 ? 1.5 : 1));
+
+    const COLORS = [[234, 59, 82], [134, 190, 78], [255, 202, 6], [99, 203, 216], [255, 75, 51]];
+    const PI_2 = 2 * Math.PI;
+    let confettiCanvas = document.getElementById('confetti-canvas');
+    let confettiContext = confettiCanvas.getContext('2d');
+    let confettiW = 0, confettiH = 0;
+    let confettiArray = [];
+    let confettiAnimationId = null;
+
+    function resizeConfettiCanvas() {
+        confettiW = confettiCanvas.width = window.innerWidth;
+        confettiH = confettiCanvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resizeConfettiCanvas, false);
+    resizeConfettiCanvas();
+
+    function range(a, b) {
+        return (b - a) * Math.random() + a;
+    }
+
+    function drawCircle(x, y, r, style) {
+        confettiContext.beginPath();
+        confettiContext.arc(x, y, r, 0, PI_2, false);
+        confettiContext.fillStyle = style;
+        confettiContext.fill();
+    }
+
+    class Confetti {
+        constructor() {
+            this.style = COLORS[Math.floor(range(0, 5))];
+            this.rgb = `rgba(${this.style[0]},${this.style[1]},${this.style[2]}`;
+            
+            // --- 4K MODIFICATION: SIZE ---
+            this.r = Math.floor(range(2, 6) * scaleFactor);
+            
+            this.r2 = 2 * this.r;
+            this.replace();
+        }
+
+        replace() {
+            this.opacity = 0;
+            this.dop = 0.03 * range(1, 4);
+            this.x = range(-this.r2, confettiW - this.r2);
+            this.y = range(-20, confettiH - this.r2);
+            this.xmax = confettiW - this.r;
+            this.ymax = confettiH - this.r;
+            
+            // --- 4K MODIFICATION: VELOCITY ---
+            // Gravity needs to be stronger on 4K or they float too slowly down the 2160px height
+            const speedScale = scaleFactor > 1 ? 1.5 : 1;
+            
+            this.vx = (range(0, 2) + 8 * 0.5 - 5) * speedScale; 
+            this.vy = (0.7 * this.r + range(-1, 1)) * (speedScale * 0.8); 
+        }
+
+        draw() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.opacity += this.dop;
+            
+            if (this.opacity > 1) {
+                this.opacity = 1;
+                this.dop *= -1;
+            }
+            
+            if (this.opacity < 0 || this.y > this.ymax) {
+                this.replace();
+            }
+            
+            if (!(0 < this.x && this.x < this.xmax)) {
+                this.x = (this.x + this.xmax) % this.xmax;
+            }
+            
+            drawCircle(Math.floor(this.x), Math.floor(this.y), this.r, `${this.rgb},${this.opacity})`);
+        }
+    }
+
+    function initConfetti() {
+        confettiArray = [];
+        for (let i = 0; i < NUM_CONFETTI; i++) {
+            confettiArray.push(new Confetti());
+        }
+    }
+
+    function animateConfetti() {
+        confettiAnimationId = requestAnimationFrame(animateConfetti);
+        confettiContext.clearRect(0, 0, confettiW, confettiH);
+        
+        for (let confetti of confettiArray) {
+            confetti.draw();
+        }
+    }
+
+    function startConfetti() {
+        confettiCanvas.classList.add('active');
+        initConfetti();
+        animateConfetti();
+        
+        setTimeout(() => {
+            stopConfetti();
+        }, 5000);
+    }
+
+    function stopConfetti() {
+        confettiCanvas.classList.remove('active');
+        if (confettiAnimationId) {
+            cancelAnimationFrame(confettiAnimationId);
+            confettiAnimationId = null;
+        }
+        confettiContext.clearRect(0, 0, confettiW, confettiH);
+    }
+
+    // swipable function on the wheel (another alternative for button)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    function handleTouchStart(event) {
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+    }
+
+    function handleTouchEnd(event) {
+        touchEndX = event.changedTouches[0].clientX;
+        touchEndY = event.changedTouches[0].clientY;
+        
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+        const minSwipeDistance = 50; // Minimum swipe distance in pixels
+        
+        // Check if it's a significant swipe (not just a tap)
+        if (Math.abs(deltaX) > minSwipeDistance || Math.abs(deltaY) > minSwipeDistance) {
+            // Trigger the same spin function as the button
+            spinWheel();
+        }
+    }
+
+    // Fullscreen functionality - triple click on title
+    let titleClickCount = 0;
+    let titleClickTimer = null;
+
+    document.querySelector('h1.main-title').addEventListener('click', function() {
+        titleClickCount++;
+        
+        if (titleClickCount === 1) {
+            titleClickTimer = setTimeout(() => {
+                titleClickCount = 0; // Reset if not triple clicked within time limit
+            }, 1000); // 1 second window for triple click
+        }
+        
+        if (titleClickCount === 3) {
+            clearTimeout(titleClickTimer);
+            titleClickCount = 0;
+            toggleFullscreen();
+        }
+    });
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            // Enter fullscreen
+            document.documentElement.requestFullscreen().catch(err => {
+                console.log('Error attempting to enable fullscreen:', err.message);
+            });
+        } else {
+            // Exit fullscreen
+            document.exitFullscreen().catch(err => {
+                console.log('Error attempting to exit fullscreen:', err.message);
+            });
+        }
+    }
+
+    // ==========================================
+    // == FULLSCREEN BUTTON LOGIC ==
+    // ==========================================
+    
+    document.getElementById('fullscreenBtn').addEventListener('click', function() {
+        // Trigger the existing toggleFullscreen function you already have
+        toggleFullscreen();
+        
+        // Optional: Add a subtle click animation or sound here if desired
+        console.log('Fullscreen toggled via button');
+    });
+</script>
+</body>
+</html>
