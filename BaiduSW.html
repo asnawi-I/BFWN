@@ -951,48 +951,35 @@
 
     // prize database
     const PRIZE_DATABASE = {
-        branches: {
-            'batu-satu': {
-                id: 1,
-                name: 'Batu Satu Branch',
-                prizes: [
-                    // Gold Prizes
-                    { id: 'B2', name: 'Gold Prize B2', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
-                    { id: 'B3', name: 'Gold Prize B3', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
-                    
-                    // Silver Prizes 
-                    { id: 'B1', name: 'Silver Prize B1', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
-                    { id: 'B4', name: 'Silver Prize B4', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
-                    
-                    // Complimentary Gifts
-                    { id: 'COMP1', name: 'Complimentary Gift 1', category: 'complimentary', quantity: 50, probability: 25, available: true, active: true, locked: false },
-                    { id: 'COMP2', name: 'Complimentary Gift 2', category: 'complimentary', quantity: 50, probability: 30, available: true, active: true, locked: false }
-
-                ]
-            },
-
-            'madang': {
-                id: 2,
-                name: 'Madang Branch',
-                prizes: [
-                    // Gold Prizes
-                    { id: 'M2', name: 'Gold Prize M1', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
-                    { id: 'M3', name: 'Gold Prize M4', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
-                    
-                    // Silver Prizes 
-                    { id: 'M1', name: 'Silver Prize M2', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
-                    { id: 'M4', name: 'Silver Prize M3', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
-                    
-                    // Complimentary Gifts
-                    { id: 'COMP3', name: 'Complimentary Gift 3', category: 'complimentary', quantity: 50, probability: 25, available: true, active: true, locked: false },
-                    { id: 'COMP4', name: 'Complimentary Gift 4', category: 'complimentary', quantity: 50, probability: 30, available: true, active: true, locked: false }
-
-                ]
-            }
+    branches: {
+        'batu-satu': {
+            id: 1,
+            name: 'Batu Satu Branch',
+            prizes: [
+                { id: 'B2', name: 'Gold Prize B2', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
+                { id: 'B3', name: 'Gold Prize B3', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
+                { id: 'B1', name: 'Silver Prize B1', category: 'silver', quantity: 1, probability: 10, available: true, active: true, locked: false },
+                { id: 'B4', name: 'Silver Prize B4', category: 'silver', quantity: 1, probability: 10, available: true, active: true, locked: false },
+                { id: 'COMP1', name: 'Complimentary Gift 1', category: 'complimentary', quantity: 50, probability: 35, available: true, active: true, locked: false },
+                { id: 'COMP2', name: 'Complimentary Gift 2', category: 'complimentary', quantity: 50, probability: 35, available: true, active: true, locked: false }
+            ]
         },
 
-        //track winner
-        winners: [],
+        'madang': {
+            id: 2,
+            name: 'Madang Branch',
+            prizes: [
+                { id: 'M2', name: 'Gold Prize M1', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
+                { id: 'M3', name: 'Gold Prize M4', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
+                { id: 'M1', name: 'Silver Prize M2', category: 'silver', quantity: 1, probability: 10, available: true, active: true, locked: false },
+                { id: 'M4', name: 'Silver Prize M3', category: 'silver', quantity: 1, probability: 10, available: true, active: true, locked: false },
+                { id: 'COMP3', name: 'Complimentary Gift 3', category: 'complimentary', quantity: 50, probability: 35, available: true, active: true, locked: false },
+                { id: 'COMP4', name: 'Complimentary Gift 4', category: 'complimentary', quantity: 50, probability: 35, available: true, active: true, locked: false }
+            ]
+        }
+    },
+    winners: []
+};
 
         //get available prizes for a branch
         getAvailablePrizes: function(branchKey) {
