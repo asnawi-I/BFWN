@@ -737,7 +737,7 @@
             </svg>
         </div>
         
-        <h1 class="main-title">Digital Spin and Wheel</h1>
+        <h1 class="main-title">DIGITAL SPIN AND WIN</h1>
 
         <div class="user-info" id="userInfo">
             <div class="welcome-text">Welcome, <span id="userName" class="highlight"></span></div>
@@ -957,16 +957,16 @@
                 name: 'Batu Satu Branch',
                 prizes: [
                     // Gold Prizes
-                    { id: 'B2', name: 'Gold Prize B2', category: 'gold', quantity: 1, probability: 5, available: true },
-                    { id: 'B3', name: 'Gold Prize B3', category: 'gold', quantity: 1, probability: 5, available: true },
+                    { id: 'B2', name: 'Gold Prize B2', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
+                    { id: 'B3', name: 'Gold Prize B3', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
                     
                     // Silver Prizes 
-                    { id: 'B1', name: 'Silver Prize B1', category: 'silver', quantity: 1, probability: 15, available: true },
-                    { id: 'B4', name: 'Silver Prize B4', category: 'silver', quantity: 1, probability: 15, available: true },
+                    { id: 'B1', name: 'Silver Prize B1', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
+                    { id: 'B4', name: 'Silver Prize B4', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
                     
                     // Complimentary Gifts
-                    { id: 'COMP1', name: 'Complimentary Gift 1', category: 'complimentary', quantity: 50, probability: 25, available: true },
-                    { id: 'COMP2', name: 'Complimentary Gift 2', category: 'complimentary', quantity: 50, probability: 30, available: true }
+                    { id: 'COMP1', name: 'Complimentary Gift 1', category: 'complimentary', quantity: 50, probability: 25, available: true, active: true, locked: false },
+                    { id: 'COMP2', name: 'Complimentary Gift 2', category: 'complimentary', quantity: 50, probability: 30, available: true, active: true, locked: false }
 
                 ]
             },
@@ -976,16 +976,16 @@
                 name: 'Madang Branch',
                 prizes: [
                     // Gold Prizes
-                    { id: 'M2', name: 'Gold Prize M1', category: 'gold', quantity: 1, probability: 5, available: true },
-                    { id: 'M3', name: 'Gold Prize M4', category: 'gold', quantity: 1, probability: 5, available: true },
+                    { id: 'M2', name: 'Gold Prize M1', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
+                    { id: 'M3', name: 'Gold Prize M4', category: 'gold', quantity: 1, probability: 5, available: true, active: true, locked: false },
                     
                     // Silver Prizes 
-                    { id: 'M1', name: 'Silver Prize M2', category: 'silver', quantity: 1, probability: 15, available: true },
-                    { id: 'M4', name: 'Silver Prize M3', category: 'silver', quantity: 1, probability: 15, available: true },
+                    { id: 'M1', name: 'Silver Prize M2', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
+                    { id: 'M4', name: 'Silver Prize M3', category: 'silver', quantity: 1, probability: 15, available: true, active: true, locked: false },
                     
                     // Complimentary Gifts
-                    { id: 'COMP3', name: 'Complimentary Gift 3', category: 'complimentary', quantity: 50, probability: 25, available: true },
-                    { id: 'COMP4', name: 'Complimentary Gift 4', category: 'complimentary', quantity: 50, probability: 30, available: true }
+                    { id: 'COMP3', name: 'Complimentary Gift 3', category: 'complimentary', quantity: 50, probability: 25, available: true, active: true, locked: false },
+                    { id: 'COMP4', name: 'Complimentary Gift 4', category: 'complimentary', quantity: 50, probability: 30, available: true, active: true, locked: false }
 
                 ]
             }
@@ -998,7 +998,7 @@
         getAvailablePrizes: function(branchKey) {
             if (!this.branches[branchKey]) return [];
             
-            const prizes = this.branches[branchKey].prizes.filter(prize => prize.quantity > 0 && prize.available);
+            const prizes = this.branches[branchKey].prizes.filter(prize => prize.quantity > 0 && prize.available && prize.active);
             
             // Check if probabilities total to 100%
             const total = prizes.reduce((sum, prize) => sum + prize.probability, 0);
